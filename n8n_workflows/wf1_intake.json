@@ -1,0 +1,416 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "upload-cv",
+        "responseMode": "responseNode",
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -560,
+        48
+      ],
+      "id": "1cdea752-7ae2-40e0-88f4-fa9442027b19",
+      "name": "Webhook",
+      "webhookId": "8d3a52d4-a2bc-4d2b-8ad0-426c3a7a9c85"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e31b96b6-ae32-49eb-8e49-0890f3109a97",
+              "leftValue": "={{ ($binary.data?.fileExtension || $binary.data0?.fileExtension || '').toLowerCase() }}",
+              "rightValue": "pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -352,
+        48
+      ],
+      "id": "6b4689d8-fe39-476a-afa0-bb1d1015dba8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/data/uploads/{{ Date.now() }}_{{ $binary.data0.fileName || 'cv.pdf' }}",
+        "dataPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "ee499987-6708-4aaa-a001-85aaf7cc92e4",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"error\",\n  \"message\": \"Vui lòng chỉ tải lên tệp định dạng PDF và dung lượng dưới 10MB!\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -128,
+        144
+      ],
+      "id": "c710802c-8959-4bbe-9aaf-b39ec5f65f53",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        -48
+      ],
+      "id": "ef684401-ab45-4df4-a977-329789c192d4",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"Full name of the candidate\"\n    },\n    \"email\": {\n      \"type\": \"string\",\n      \"description\": \"Email address of the candidate\"\n    },\n    \"phone\": {\n      \"type\": \"string\",\n      \"description\": \"Phone number of the candidate\"\n    },\n    \"skills\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Technical and professional skills\"\n    },\n    \"experience\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Work experience history\"\n    },\n    \"education\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Education history, universities or degrees\"\n    },\n    \"applied_position\": {\n      \"type\": \"string\",\n      \"description\": \"Target job position or title applied for (e.g. Backend Developer, Frontend Intern)\"\n    }\n  },\n  \"required\": [\n    \"name\",\n    \"email\",\n    \"phone\",\n    \"skills\",\n    \"experience\",\n    \"education\",\n    \"applied_position\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        -32
+      ],
+      "id": "95756558-371e-4e82-a651-2424fc6985f6",
+      "name": "Information Extractor",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        416,
+        192
+      ],
+      "id": "6ae0944c-c2d9-432d-a4d5-ebd1afc15757",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "QiDaUYyK4A7YUnVn",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM",
+          "mode": "list",
+          "cachedResultName": "Danh sách ứng viên",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1001,
+          "mode": "list",
+          "cachedResultName": "Danh sách ứng viên - CV Parser",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit#gid=1001"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Họ và tên": "={{ $json.output?.ho_va_ten || $json.output?.name || $json.ho_va_ten || $json.name || '' }}",
+            "Email": "={{ $json.output?.email || $json.email || '' }}",
+            "Số điện thoại": "={{ $json.output?.so_dien_thoai || $json.output?.phone || $json.so_dien_thoai || $json.phone || '' }}",
+            "Kỹ năng": "={{ ($json.output?.ky_nang || $json.output?.skills || $json.ky_nang || $json.skills || []).join(', ') }}",
+            "Kinh nghiệm": "={{ ($json.output?.kinh_nghiem || $json.output?.experience || $json.kinh_nghiem || $json.experience || []).join('; ') }}",
+            "Học Vấn": "={{ ($json.output?.hoc_van || $json.output?.education || $json.hoc_van || $json.education || []).join('; ') }}",
+            "Vị trí ứng tuyển": "={{ ($json.output?.applied_position || $json.applied_position || '').replace(/\\s*\\(?-\\s*JOB\\d+\\)?/i, '').trim() }}",
+            "Thời gian nộp": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "job_id": "={{ ($json.output?.applied_position || $json.applied_position || '').match(/JOB\\d+/i)?.[0]?.toUpperCase() || 'JOB001' }}",
+            "Trạng thái gửi email cho HR": "Chưa gửi"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Họ và tên",
+              "displayName": "Họ và tên",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Số điện thoại",
+              "displayName": "Số điện thoại",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Kỹ năng",
+              "displayName": "Kỹ năng",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Kinh nghiệm",
+              "displayName": "Kinh nghiệm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Học Vấn",
+              "displayName": "Học Vấn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Vị trí ứng tuyển",
+              "displayName": "Vị trí ứng tuyển",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Thời gian nộp",
+              "displayName": "Thời gian nộp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Trạng thái gửi email cho HR",
+              "displayName": "Trạng thái gửi email cho HR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        -32
+      ],
+      "id": "97aabde9-42cf-4019-a395-32fa958a7cb1",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HMONN8OsdVtmrggq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "sg7tYEZdInKAZv9r",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/sg7tYEZdInKAZv9r",
+          "cachedResultName": "CV Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        960,
+        -32
+      ],
+      "id": "4572962c-ddb0-4185-9504-c31074fc6571",
+      "name": "Call 'CV Processing'",
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Call 'CV Processing'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "4eeb9490923bde1d302c216ecf5db73101b42102d73c9b53de2f9791db4034ef"
+  }
+}

@@ -1,0 +1,753 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM",
+          "mode": "list",
+          "cachedResultName": "Danh sách ứng viên",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1446628200,
+          "mode": "list",
+          "cachedResultName": "CV_Match_Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit#gid=1446628200"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        128
+      ],
+      "id": "e2a26883-fae3-4b85-8df4-52e749a2afce",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "cEF7DmSol8HBB07e",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"Quyết định của HR\"] }}",
+                    "rightValue": "Approve",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "eaf0b617-e3f1-4b55-8a48-09d3dea80a8c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f346d9be-eec2-44ef-b075-6c769a944575",
+                    "leftValue": "={{ $json[\"Quyết định của HR\"] }}",
+                    "rightValue": "Reject",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        112
+      ],
+      "id": "7add1cc9-8853-46af-a8ce-ebd78526ab2b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json[\"Email ứng viên\"] }}",
+        "subject": "Thông báo kết quả tuyển dụng – Bạn đã được duyệt",
+        "message": "=Subject: Thư mời phỏng vấn – {{ $json[\"Vị trí ứng tuyển\"] }}\n\n<div style=\"margin:0;padding:32px 12px;background-color:#f3f5f9;font-family:Arial,Helvetica,sans-serif;color:#273449;\">\n  <div style=\"max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;\">\n\n    <div style=\"background-color:#173b67;padding:28px 32px;text-align:center;\">\n      <h1 style=\"margin:0;color:#ffffff;font-size:23px;letter-spacing:0.5px;\">\n        THƯ MỜI PHỎNG VẤN\n      </h1>\n      <p style=\"margin:10px 0 0;color:#dbeafe;font-size:14px;\">\n        THÔNG BÁO KẾT QUẢ XÉT DUYỆT HỒ SƠ\n      </p>\n    </div>\n\n    <div style=\"padding:32px;\">\n      <p style=\"margin:0 0 18px;font-size:16px;\">\n        Kính gửi <strong>{{ $json[\"Họ và tên ứng viên\"] }}</strong>,\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 16px;\">\n        Cảm ơn bạn đã quan tâm và ứng tuyển vào vị trí\n        <strong style=\"color:#173b67;\">{{ $json[\"Vị trí ứng tuyển\"] }}</strong>\n        tại công ty chúng tôi.\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 22px;\">\n        Chúng tôi trân trọng thông báo rằng hồ sơ của bạn đã vượt qua\n        vòng xét duyệt. Chúng tôi xin mời bạn tham gia buổi phỏng vấn\n        theo thông tin dưới đây:\n      </p>\n\n      <div style=\"background-color:#f0f6ff;border:1px solid #d6e6ff;border-radius:8px;padding:22px;margin:0 0 24px;\">\n        <h2 style=\"margin:0 0 18px;color:#173b67;font-size:17px;\">\n          THÔNG TIN PHỎNG VẤN\n        </h2>\n\n        <p style=\"margin:0 0 14px;font-size:14px;line-height:1.7;\">\n          <strong>Vị trí ứng tuyển:</strong><br>\n          {{ $json[\"Vị trí ứng tuyển\"] }}\n        </p>\n\n        <p style=\"margin:0 0 14px;font-size:14px;line-height:1.7;\">\n          <strong>Ngày phỏng vấn:</strong><br>\n         {{ DateTime.fromISO('1899-12-30').plus({ days: Number($json[\"Ngày phỏng vấn\"]) }).toFormat('dd/MM/yyyy') }}\n        </p>\n\n        <p style=\"margin:0;font-size:14px;line-height:1.7;\">\n  <strong>Giờ phỏng vấn:</strong><br>\n  {{ $json[\"Giờ phỏng vấn\"] }} \n</p>\n      </div>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 16px;\">\n        Bạn vui lòng sắp xếp thời gian tham gia đúng lịch hẹn. Nếu cần\n        xác nhận lịch phỏng vấn hoặc có bất kỳ thắc mắc nào, vui lòng\n        phản hồi email này để được hỗ trợ.\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 24px;\">\n        Chúng tôi mong sớm được gặp gỡ và trao đổi cùng bạn!\n      </p>\n\n      <div style=\"border-top:1px solid #e5e7eb;padding-top:20px;\">\n        <p style=\"margin:0 0 5px;font-size:14px;\">Trân trọng,</p>\n        <p style=\"margin:0;font-size:15px;font-weight:bold;color:#173b67;\">\n          BỘ PHẬN TUYỂN DỤNG\n        </p>\n        <p style=\"margin:6px 0 0;font-size:12px;color:#6b7280;\">\n          Email này được gửi tự động từ hệ thống quản lý tuyển dụng.\n        </p>\n      </div>\n    </div>\n  </div>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5d499621-8d66-4c40-87d6-ec10dfd1ccce",
+      "name": "Send a message",
+      "webhookId": "a6354130-8a87-4c45-9bbe-8d516f3e3183",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "d9Rl5bfIY0g1Pftw",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json[\"Email ứng viên\"] }}",
+        "subject": "Thông báo kết quả tuyển dụng",
+        "message": "=Subject: Thông báo kết quả tuyển dụng – {{ $json[\"Vị trí ứng tuyển\"] }}\n\n<div style=\"margin:0;padding:32px 12px;background-color:#f3f5f9;font-family:Arial,Helvetica,sans-serif;color:#273449;\">\n  <div style=\"max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;\">\n\n    <!-- Header -->\n    <div style=\"background-color:#173b67;padding:28px 32px;text-align:center;\">\n      <h1 style=\"margin:0;color:#ffffff;font-size:22px;letter-spacing:0.4px;\">\n        THÔNG BÁO KẾT QUẢ TUYỂN DỤNG\n      </h1>\n      <p style=\"margin:10px 0 0;color:#dbeafe;font-size:14px;\">\n        CẢM ƠN BẠN ĐÃ QUAN TÂM VÀ ỨNG TUYỂN\n      </p>\n    </div>\n\n    <!-- Email content -->\n    <div style=\"padding:32px;\">\n      <p style=\"margin:0 0 20px;font-size:16px;\">\n        Kính gửi <strong>{{ $json[\"Họ và tên ứng viên\"] }}</strong>,\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 16px;\">\n        Công ty chúng tôi xin chân thành cảm ơn bạn đã quan tâm,\n        dành thời gian tìm hiểu và ứng tuyển vào vị trí\n        <strong style=\"color:#173b67;\">{{ $json[\"Vị trí ứng tuyển\"] }}</strong>.\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 20px;\">\n        Sau khi xem xét hồ sơ và đánh giá mức độ phù hợp với các\n        yêu cầu của vị trí tuyển dụng, chúng tôi rất tiếc phải thông\n        báo rằng bạn chưa được lựa chọn trong đợt tuyển dụng lần này.\n      </p>\n\n      <!-- Result box -->\n      <div style=\"background-color:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #64748b;border-radius:6px;padding:20px;margin:0 0 24px;\">\n        <p style=\"margin:0 0 12px;font-size:14px;color:#475569;\">\n          <strong>THÔNG TIN KẾT QUẢ ỨNG TUYỂN</strong>\n        </p>\n        <p style=\"margin:0 0 8px;font-size:14px;line-height:1.7;\">\n          <strong>Họ và tên:</strong> {{ $json[\"Họ và tên\"] }}\n        </p>\n        <p style=\"margin:0;font-size:14px;line-height:1.7;\">\n          <strong>Vị trí ứng tuyển:</strong> {{ $json[\"Vị trí ứng tuyển\"] }}\n        </p>\n      </div>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 16px;\">\n        Chúng tôi trân trọng sự quan tâm, nỗ lực và thời gian bạn\n        đã dành cho quá trình ứng tuyển. Quyết định này chỉ phản ánh\n        mức độ phù hợp với yêu cầu của vị trí trong thời điểm hiện tại.\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 24px;\">\n        Hy vọng bạn sẽ tiếp tục phát triển các kỹ năng và kinh nghiệm\n        của mình. Chúng tôi mong có cơ hội được kết nối với bạn trong\n        những đợt tuyển dụng tiếp theo nếu xuất hiện vị trí phù hợp.\n        Chúc bạn nhiều thành công trên con đường sự nghiệp.\n      </p>\n\n      <!-- Signature -->\n      <div style=\"border-top:1px solid #e5e7eb;padding-top:20px;\">\n        <p style=\"margin:0 0 8px;font-size:14px;\">Trân trọng,</p>\n        <p style=\"margin:0;font-size:15px;font-weight:bold;color:#173b67;\">\n          BỘ PHẬN TUYỂN DỤNG\n        </p>\n        <p style=\"margin:8px 0 0;font-size:12px;color:#6b7280;\">\n          Công ty gửi email này tự động từ hệ thống quản lý tuyển dụng.\n          Vui lòng không trả lời trực tiếp email này nếu hộp thư không hỗ trợ phản hồi.\n        </p>\n      </div>\n    </div>\n\n    <!-- Footer -->\n    <div style=\"background-color:#f8fafc;padding:16px;text-align:center;border-top:1px solid #e5e7eb;\">\n      <p style=\"margin:0;font-size:11px;color:#94a3b8;\">\n        Cảm ơn bạn đã quan tâm đến cơ hội nghề nghiệp tại công ty chúng tôi.\n      </p>\n    </div>\n\n  </div>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        240
+      ],
+      "id": "d30ca8eb-afad-4dba-879a-113078c8daed",
+      "name": "Send a message1",
+      "webhookId": "18a13275-4577-420b-9a9f-bb4385dadef8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "d9Rl5bfIY0g1Pftw",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM",
+          "mode": "list",
+          "cachedResultName": "Danh sách ứng viên",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1446628200,
+          "mode": "list",
+          "cachedResultName": "CV_Match_Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit#gid=1446628200"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email ứng viên": "",
+            "Trạng thái gửi email cho ứng viên": "Đã gửi",
+            "row_number": "={{ $('Google Sheets Trigger').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Họ và tên ứng viên",
+              "displayName": "Họ và tên ứng viên",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email ứng viên",
+              "displayName": "Email ứng viên",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Vị trí ứng tuyển",
+              "displayName": "Vị trí ứng tuyển",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mã tin tuyển dụng",
+              "displayName": "Mã tin tuyển dụng",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tên vị trí tuyển dụng",
+              "displayName": "Tên vị trí tuyển dụng",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Điểm phù hợp",
+              "displayName": "Điểm phù hợp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Đề xuất đánh giá",
+              "displayName": "Đề xuất đánh giá",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kỹ năng bắt buộc phù hợp",
+              "displayName": "Kỹ năng bắt buộc phù hợp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kỹ năng bắt buộc còn thiếu",
+              "displayName": "Kỹ năng bắt buộc còn thiếu",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kỹ năng ưu tiên phù hợp",
+              "displayName": "Kỹ năng ưu tiên phù hợp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kỹ năng ưu tiên còn thiếu",
+              "displayName": "Kỹ năng ưu tiên còn thiếu",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kinh nghiệm liên quan",
+              "displayName": "Kinh nghiệm liên quan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lý do đánh giá",
+              "displayName": "Lý do đánh giá",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phương pháp đánh giá",
+              "displayName": "Phương pháp đánh giá",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Thời gian đánh giá",
+              "displayName": "Thời gian đánh giá",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quyết định của HR",
+              "displayName": "Quyết định của HR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ngày phỏng vấn",
+              "displayName": "Ngày phỏng vấn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Giờ phỏng vấn",
+              "displayName": "Giờ phỏng vấn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trạng thái gửi email cho ứng viên",
+              "displayName": "Trạng thái gửi email cho ứng viên",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        240
+      ],
+      "id": "63bace05-ad48-4918-9e84-dedaac4fb1ca",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HMONN8OsdVtmrggq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7e592ba2-4944-432f-b5cb-e29961452a26",
+              "leftValue": "={{ $json[\"Trạng thái gửi email cho ứng viên\"] }}",
+              "rightValue": "Chưa gửi",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -576,
+        128
+      ],
+      "id": "6a6fbf41-315f-428b-9595-83db253cb3b8",
+      "name": "If-Kiểm tra đã gửi Email"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "phanthi04072006@gmail.com",
+          "mode": "id"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        0
+      ],
+      "id": "1cedb45a-1b37-483f-aca3-860fcc53fe83",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ODItPqA3bR1ecpHH",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM",
+          "mode": "list",
+          "cachedResultName": "Danh sách ứng viên",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1446628200,
+          "mode": "list",
+          "cachedResultName": "CV_Match_Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit#gid=1446628200"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email ứng viên": "",
+            "Trạng thái gửi email cho ứng viên": "Đã gửi",
+            "row_number": "={{ $('Google Sheets Trigger').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Họ và tên ứng viên",
+              "displayName": "Họ và tên ứng viên",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email ứng viên",
+              "displayName": "Email ứng viên",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Vị trí ứng tuyển",
+              "displayName": "Vị trí ứng tuyển",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mã tin tuyển dụng",
+              "displayName": "Mã tin tuyển dụng",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tên vị trí tuyển dụng",
+              "displayName": "Tên vị trí tuyển dụng",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Điểm phù hợp",
+              "displayName": "Điểm phù hợp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Đề xuất đánh giá",
+              "displayName": "Đề xuất đánh giá",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kỹ năng bắt buộc phù hợp",
+              "displayName": "Kỹ năng bắt buộc phù hợp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kỹ năng bắt buộc còn thiếu",
+              "displayName": "Kỹ năng bắt buộc còn thiếu",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kỹ năng ưu tiên phù hợp",
+              "displayName": "Kỹ năng ưu tiên phù hợp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kỹ năng ưu tiên còn thiếu",
+              "displayName": "Kỹ năng ưu tiên còn thiếu",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Kinh nghiệm liên quan",
+              "displayName": "Kinh nghiệm liên quan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lý do đánh giá",
+              "displayName": "Lý do đánh giá",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phương pháp đánh giá",
+              "displayName": "Phương pháp đánh giá",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Thời gian đánh giá",
+              "displayName": "Thời gian đánh giá",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quyết định của HR",
+              "displayName": "Quyết định của HR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ngày phỏng vấn",
+              "displayName": "Ngày phỏng vấn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Giờ phỏng vấn",
+              "displayName": "Giờ phỏng vấn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trạng thái gửi email cho ứng viên",
+              "displayName": "Trạng thái gửi email cho ứng viên",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        0
+      ],
+      "id": "8c017248-7e35-4fbf-bc45-5e6a159c8ee5",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HMONN8OsdVtmrggq",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If-Kiểm tra đã gửi Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If-Kiểm tra đã gửi Email": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4eeb9490923bde1d302c216ecf5db73101b42102d73c9b53de2f9791db4034ef"
+  }
+}
