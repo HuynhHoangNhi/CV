@@ -12,8 +12,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.2,
       "position": [
-        -560,
-        48
+        -1152,
+        208
       ],
       "id": "1cdea752-7ae2-40e0-88f4-fa9442027b19",
       "name": "Webhook",
@@ -46,8 +46,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -352,
-        48
+        -912,
+        208
       ],
       "id": "6b4689d8-fe39-476a-afa0-bb1d1015dba8",
       "name": "If"
@@ -55,15 +55,15 @@
     {
       "parameters": {
         "operation": "write",
-        "fileName": "=/data/uploads/{{ Date.now() }}_{{ $binary.data0.fileName || 'cv.pdf' }}",
+        "fileName": "=/data/uploads/{{ $execution.id }}_{{ $binary.data0?.fileName || 'cv.pdf' }}",
         "dataPropertyName": "data0",
         "options": {}
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1.1,
       "position": [
-        -96,
-        -48
+        -224,
+        0
       ],
       "id": "ee499987-6708-4aaa-a001-85aaf7cc92e4",
       "name": "Read/Write Files from Disk"
@@ -79,8 +79,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -128,
-        144
+        -144,
+        432
       ],
       "id": "c710802c-8959-4bbe-9aaf-b39ec5f65f53",
       "name": "Respond to Webhook"
@@ -94,8 +94,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        176,
-        -48
+        64,
+        0
       ],
       "id": "ef684401-ab45-4df4-a977-329789c192d4",
       "name": "Extract from File"
@@ -111,7 +111,7 @@
       "typeVersion": 1.2,
       "position": [
         384,
-        -32
+        0
       ],
       "id": "95756558-371e-4e82-a651-2424fc6985f6",
       "name": "Information Extractor",
@@ -158,7 +158,6 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Họ và tên": "={{ $json.output?.ho_va_ten || $json.output?.name || $json.ho_va_ten || $json.name || '' }}",
             "Email": "={{ $json.output?.email || $json.email || '' }}",
             "Số điện thoại": "={{ $json.output?.so_dien_thoai || $json.output?.phone || $json.so_dien_thoai || $json.phone || '' }}",
             "Kỹ năng": "={{ ($json.output?.ky_nang || $json.output?.skills || $json.ky_nang || $json.skills || []).join(', ') }}",
@@ -167,9 +166,12 @@
             "Vị trí ứng tuyển": "={{ ($json.output?.applied_position || $json.applied_position || '').replace(/\\s*\\(?-\\s*JOB\\d+\\)?/i, '').trim() }}",
             "Thời gian nộp": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
             "job_id": "={{ ($json.output?.applied_position || $json.applied_position || '').match(/JOB\\d+/i)?.[0]?.toUpperCase() || 'JOB001' }}",
-            "Trạng thái gửi email cho HR": "Chưa gửi"
+            "Trạng thái gửi email cho HR": "Chưa gửi",
+            "Họ và tên": "={{ $json.output?.full_name || $json.output?.ho_va_ten || $json.output?.name || $json.ho_va_ten || $json.full_name || $json.name || '' }}"
           },
-          "matchingColumns": [],
+          "matchingColumns": [
+            "id"
+          ],
           "schema": [
             {
               "id": "Họ và tên",
@@ -280,8 +282,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        736,
-        -32
+        1008,
+        0
       ],
       "id": "97aabde9-42cf-4019-a395-32fa958a7cb1",
       "name": "Append row in sheet",
@@ -314,13 +316,84 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.4,
       "position": [
-        960,
-        -32
+        1248,
+        -16
       ],
       "id": "4572962c-ddb0-4185-9504-c31074fc6571",
       "name": "Call 'CV Processing'",
       "alwaysOutputData": false,
       "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26973270-fd47-46c6-80d5-98c8bf48344c",
+              "name": "=fileSizeMB",
+              "value": "={{ parseFloat($binary.data0.fileSize) / 1024 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -688,
+        192
+      ],
+      "id": "e2e82392-a5dc-4778-ab2d-91ec28c00acc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "68aa8109-a987-4c24-a4c8-8df05d0a26b7",
+              "leftValue": "={{ $json.fileSizeMB }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -448,
+        192
+      ],
+      "id": "03fe2a2b-fb55-47c4-a817-1a7dfbd8908b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  // Chuẩn hóa số điện thoại về dạng chuẩn (+84)\n  let phone = item.json.output?.phone || item.json.phone || '';\n  phone = phone.replace(/[^0-9+]/g, '');\n  if (phone.startsWith('0')) {\n    phone = '+84' + phone.slice(1);\n  }\n  \n  // Viết hoa chữ cái đầu cho Họ và Tên\n  let name = item.json.output?.name || item.json.name || '';\n  if (name) {\n    name = name.toLowerCase().replace(/(^\\w{1})|(\\s+\\w{1})/g, letter => letter.toUpperCase());\n  }\n\n  // Gán lại dữ liệu đã làm sạch\n  item.json.ho_va_ten = name;\n  item.json.so_dien_thoai = phone;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        0
+      ],
+      "id": "2182d81d-f654-43b2-a6a7-a37567017b4b",
+      "name": "Code in JavaScript"
     }
   ],
   "connections": {
@@ -339,18 +412,12 @@
       "main": [
         [
           {
-            "node": "Read/Write Files from Disk",
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
         ],
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Read/Write Files from Disk": {
@@ -379,7 +446,7 @@
       "main": [
         [
           {
-            "node": "Append row in sheet",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -402,6 +469,46 @@
         [
           {
             "node": "Call 'CV Processing'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
             "type": "main",
             "index": 0
           }
