@@ -6,146 +6,6 @@ import {
   Inbox, Send, Video, Sparkles, Plus, Trash2, Edit3, Layers, FileSpreadsheet, Settings
 } from 'lucide-react';
 
-// --- DỮ LIỆU KHỞI TẠO DỰ PHÒNG (KHI N8N OFFLINE) ---
-
-const initialJobs = [
-  {
-    job_id: 'JOB001',
-    job_title: 'Backend Developer',
-    job_description: 'Phát triển REST API, xây dựng chức năng backend và làm việc với cơ sở dữ liệu.',
-    required_skills: 'Java, Spring Boot, PostgreSQL, RESTful API, Git',
-    required_experience: 'Có kiến thức backend; ưu tiên kinh nghiệm xây dựng API và hệ thống thực tế.',
-    preferred_skills: 'Docker, Redis, Microservices, CI/CD',
-    work_type: 'Full-time',
-    benefits: 'Được hướng dẫn chuyên môn, tham gia dự án thực tế, bảo hiểm.',
-    deadline: '2026-12-31',
-    status: 'Open'
-  },
-  {
-    job_id: 'JOB002',
-    job_title: 'Chuyên viên Phân tích Dữ liệu (Data Analyst)',
-    job_description: 'Thu thập, xử lý và phân tích dữ liệu; xây dựng báo cáo, trực quan hóa dữ liệu và hỗ trợ các bộ phận đưa ra quyết định dựa trên dữ liệu.',
-    required_skills: 'SQL, Excel, Python, Data Analysis, Data Visualization',
-    required_experience: 'Có kiến thức về phân tích dữ liệu, xử lý dữ liệu và xây dựng báo cáo; ưu tiên ứng viên đã thực hiện dự án phân tích dữ liệu thực tế.',
-    preferred_skills: 'Power BI, Tableau, Pandas, Statistics, Machine Learning',
-    work_type: 'Full-time',
-    benefits: 'Được hướng dẫn chuyên môn, tham gia dự án phân tích dữ liệu thực tế, cơ hội đào tạo và phát triển nghề nghiệp, bảo hiểm.',
-    deadline: '2026-12-31',
-    status: 'Open'
-  },
-  {
-    job_id: 'JOB003',
-    job_title: 'Chuyên viên Truyền thông & Marketing (Marketing Executive)',
-    job_description: 'Lập kế hoạch và triển khai hoạt động truyền thông, xây dựng nội dung trên các kênh trực tuyến, hỗ trợ tổ chức sự kiện và theo dõi hiệu quả các chiến dịch marketing.',
-    required_skills: 'Content Marketing, Social Media, Copywriting, Communication, Marketing Planning',
-    required_experience: 'Có kiến thức về truyền thông và marketing; ưu tiên kinh nghiệm xây dựng nội dung, quản lý mạng xã hội hoặc triển khai chiến dịch truyền thông.',
-    preferred_skills: 'SEO, Canva, Digital Marketing, Google Analytics, Event Planning',
-    work_type: 'Full-time',
-    benefits: 'Được hướng dẫn chuyên môn, tham gia các chiến dịch truyền thông thực tế, cơ hội đào tạo và phát triển nghề nghiệp, bảo hiểm.',
-    deadline: '2026-12-31',
-    status: 'Open'
-  }
-];
-
-const initialParserCandidates = [
-  {
-    "Họ và tên": "NGUYỄN VĂN AN",
-    "Email": "nguyenvanan.dev@gmail.com",
-    "Số điện thoại": "0912345678",
-    "Kỹ năng": "Java, Spring Boot, PostgreSQL, Docker, Git, RESTful API, Redis, Microservices",
-    "Kinh nghiệm": "Junior Backend Developer tại Công ty TNHH Giải pháp Phần mềm ABC",
-    "Học Vấn": "Đại học Bách Khoa - Đại học Đà Nẵng (GPA 3.52/4.0)",
-    "Vị trí ứng tuyển": "Backend Developer",
-    "Thời gian nộp": "2026-10-09 21:07:27",
-    "job_id": "JOB001",
-    "Trạng thái gửi email cho HR": "Đã gửi"
-  },
-  {
-    "Họ và tên": "TRẦN MINH HOÀNG",
-    "Email": "hoang.tm.data@gmail.com",
-    "Số điện thoại": "0905123456",
-    "Kỹ năng": "SQL (PostgreSQL, MySQL), Python (Pandas, NumPy), Power BI, Tableau, Excel (Advanced)",
-    "Kinh nghiệm": "Chuyên viên Phân tích Dữ liệu tại Công ty TNHH Bán lẻ Global",
-    "Học Vấn": "Đại học Kinh tế - Đại học Đà Nẵng (GPA 3.6/4.0)",
-    "Vị trí ứng tuyển": "Chuyên viên Phân tích Dữ liệu (Data Analyst)",
-    "Thời gian nộp": "2026-10-10 07:48:18",
-    "job_id": "JOB002",
-    "Trạng thái gửi email cho HR": "Đã gửi"
-  },
-  {
-    "Họ và tên": "PHẠM THU TRANG",
-    "Email": "huynhhoangnhi1902@gmail.com",
-    "Số điện thoại": "0934567890",
-    "Kỹ năng": "Digital Marketing, Content Marketing, Facebook Ads, SEO / SEM, Canva & CapCut",
-    "Kinh nghiệm": "Chuyên viên Content & Digital Marketing tại SunMedia",
-    "Học Vấn": "Đại học Quốc gia TP.HCM - Trường ĐH KHXH&NV",
-    "Vị trí ứng tuyển": "Chuyên viên Truyền thông & Marketing (Marketing Executive)",
-    "Thời gian nộp": "2026-10-10 07:49:27",
-    "job_id": "JOB003",
-    "Trạng thái gửi email cho HR": "Đã gửi"
-  }
-];
-
-const initialMatchResults = [
-  {
-    "Họ và tên ứng viên": "NGUYỄN VĂN AN",
-    "Email ứng viên": "nguyenvanan.dev@gmail.com",
-    "Vị trí ứng tuyển": "Backend Developer",
-    "Mã tin tuyển dụng": "JOB001",
-    "Tên vị trí tuyển dụng": "Backend Developer",
-    "Điểm phù hợp": 10.0,
-    "Đề xuất đánh giá": "Strong Match",
-    "Kỹ năng bắt buộc phù hợp": "Java, Spring Boot, PostgreSQL, RESTful API, Git",
-    "Kỹ năng bắt buộc còn thiếu": "Không",
-    "Kỹ năng ưu tiên phù hợp": "Docker, Redis, Microservices, CI/CD",
-    "Kỹ năng ưu tiên còn thiếu": "Không",
-    "Lý do đánh giá": "Đáp ứng 5/5 kỹ năng bắt buộc. Đáp ứng 4/4 kỹ năng ưu tiên. Tìm thấy từ khóa kinh nghiệm liên quan đến vị trí.",
-    "Quyết định của HR": "Approve",
-    "Ngày phỏng vấn": "2026-11-14",
-    "Giờ phỏng vấn": "07:30",
-    "Google Meet": "https://meet.google.com/abc-defg-hij",
-    "Trạng thái gửi email cho ứng viên": "Đã gửi"
-  },
-  {
-    "Họ và tên ứng viên": "TRẦN MINH HOÀNG",
-    "Email ứng viên": "hoang.tm.data@gmail.com",
-    "Vị trí ứng tuyển": "Chuyên viên Phân tích Dữ liệu (Data Analyst)",
-    "Mã tin tuyển dụng": "JOB002",
-    "Tên vị trí tuyển dụng": "Chuyên viên Phân tích Dữ liệu (Data Analyst)",
-    "Điểm phù hợp": 6.4,
-    "Đề xuất đánh giá": "Potential Match",
-    "Kỹ năng bắt buộc phù hợp": "SQL, Excel, Python",
-    "Kỹ năng bắt buộc còn thiếu": "Data Analysis, Data Visualization",
-    "Kỹ năng ưu tiên phù hợp": "Power BI, Tableau, Pandas",
-    "Kỹ năng ưu tiên còn thiếu": "Statistics, Machine Learning",
-    "Lý do đánh giá": "Đáp ứng 3/5 kỹ năng bắt buộc. Đáp ứng 3/5 kỹ năng ưu tiên.",
-    "Quyết định của HR": "Reject",
-    "Ngày phỏng vấn": "-",
-    "Giờ phỏng vấn": "-",
-    "Google Meet": "",
-    "Trạng thái gửi email cho ứng viên": "Đã gửi"
-  },
-  {
-    "Họ và tên ứng viên": "PHẠM THU TRANG",
-    "Email ứng viên": "huynhhoangnhi1902@gmail.com",
-    "Vị trí ứng tuyển": "Chuyên viên Truyền thông & Marketing (Marketing Executive)",
-    "Mã tin tuyển dụng": "JOB003",
-    "Tên vị trí tuyển dụng": "Chuyên viên Truyền thông & Marketing (Marketing Executive)",
-    "Điểm phù hợp": 5.4,
-    "Đề xuất đánh giá": "Low Match",
-    "Kỹ năng bắt buộc phù hợp": "Content Marketing, Copywriting",
-    "Kỹ năng bắt buộc còn thiếu": "Social Media, Communication, Marketing Planning",
-    "Kỹ năng ưu tiên phù hợp": "SEO, Canva, Digital Marketing, Google Analytics",
-    "Kỹ năng ưu tiên còn thiếu": "Event Planning",
-    "Lý do đánh giá": "Đáp ứng 2/5 kỹ năng bắt buộc. Đáp ứng 4/5 kỹ năng ưu tiên.",
-    "Quyết định của HR": "Pending Review",
-    "Ngày phỏng vấn": "-",
-    "Giờ phỏng vấn": "-",
-    "Google Meet": "",
-    "Trạng thái gửi email cho ứng viên": "Chưa gửi"
-  }
-];
-
 // --- CHUẨN HÓA DỮ LIỆU ĐỌC TỪ 3 SHEET GOOGLE SHEETS ---
 const toSheetDate = (value) => {
   if (!value) return '';
@@ -154,7 +14,7 @@ const toSheetDate = (value) => {
     return local.toISOString().slice(0, 10);
   }
   const raw = String(value).trim();
-  if (!raw) return '';
+  if (!raw || raw === '-' || raw === 'NaT') return '';
   const iso = raw.match(/^(\d{4}-\d{2}-\d{2})/);
   if (iso) return iso[1];
   const vn = raw.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
@@ -228,17 +88,17 @@ export default function App() {
   const [adminTab, setAdminTab] = useState(3);
   const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
 
-  // Webhook Endpoints
+  // Webhook Endpoints kết nối n8n
   const [webhookUrl, setWebhookUrl] = useState('http://localhost:5678/webhook/upload-cv');
   const [hrWebhookUrl, setHrWebhookUrl] = useState('http://localhost:5678/webhook/hr-decision');
   const [getDataUrl, setGetDataUrl] = useState('http://localhost:5678/webhook/sync-sheets');
   const [jobWebhookUrl, setJobWebhookUrl] = useState('http://localhost:5678/webhook/job-management');
   const [showConfigModal, setShowConfigModal] = useState(false);
 
-  // Core App States
-  const [jobs, setJobs] = useState(initialJobs);
-  const [parserCandidates, setParserCandidates] = useState(initialParserCandidates);
-  const [matchResults, setMatchResults] = useState(initialMatchResults);
+  // Core App States (Mặc định mảng trống để đồng bộ thật từ Google Sheets)
+  const [jobs, setJobs] = useState([]);
+  const [parserCandidates, setParserCandidates] = useState([]);
+  const [matchResults, setMatchResults] = useState([]);
   const [interviewSchedules, setInterviewSchedules] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -270,12 +130,12 @@ export default function App() {
     setTimeout(() => setNotification({ show: false, message: '', type: 'success' }), 4000);
   };
 
-  // --- FETCH LIVE DATA FROM N8N / GOOGLE SHEETS ---
+  // --- ĐỒNG BỘ 100% DỮ LIỆU TỪ N8N & GOOGLE SHEETS ---
   const fetchSheetData = async () => {
     setIsLoading(true);
     try {
       const res = await fetch(getDataUrl, { method: 'GET', headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error(`Server response status: ${res.status}`);
+      if (!res.ok) throw new Error(`Lỗi phản hồi từ server n8n: ${res.status}`);
       const payload = await res.json();
       
       let data = payload;
@@ -285,6 +145,7 @@ export default function App() {
         data = payload.data;
       }
 
+      // Trích xuất dữ liệu từ các nhánh/sheet trả về của n8n
       const jobsRows = data.jobs ?? data.Job_Postings ?? data['Job_Postings'] ?? data.job_postings ?? [];
       const candidateRows =
         data['Danh sách ứng viên'] ??
@@ -297,16 +158,16 @@ export default function App() {
       const normalizedCandidates = Array.isArray(candidateRows) ? candidateRows.map(normalizeCandidateRow) : [];
       const normalizedMatches = Array.isArray(matchRows) ? matchRows.map(normalizeMatchRow) : [];
 
-      setJobs(normalizedJobs.length > 0 ? normalizedJobs : initialJobs);
-      setParserCandidates(normalizedCandidates.length > 0 ? normalizedCandidates : initialParserCandidates);
-      setMatchResults(normalizedMatches.length > 0 ? normalizedMatches : initialMatchResults);
+      setJobs(normalizedJobs);
+      setParserCandidates(normalizedCandidates);
+      setMatchResults(normalizedMatches);
       
       showToast(
-        `Đồng bộ thành công: ${normalizedJobs.length} tin tuyển dụng, ${normalizedCandidates.length} hồ sơ CV, ${normalizedMatches.length} kết quả AI.`
+        `Đồng bộ Google Sheets thành công: ${normalizedJobs.length} tin, ${normalizedCandidates.length} CV, ${normalizedMatches.length} kết quả AI.`
       );
     } catch (err) {
-      console.error('Không thể đồng bộ Google Sheets qua n8n:', err);
-      showToast('Đồng bộ Google Sheets thất bại. Kiểm tra URL và dữ liệu trả về của webhook GET.', 'error');
+      console.error('Lỗi đồng bộ Google Sheets qua n8n:', err);
+      showToast('Không thể kết nối n8n. Hãy kiểm tra lại server n8n và trạng thái Active của Workflow!', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -350,10 +211,10 @@ export default function App() {
       });
       if (!res.ok) throw new Error(`Server response status: ${res.status}`);
       await fetchSheetData();
-      showToast(`Đã gửi yêu cầu xóa ${jobId} và đồng bộ lại Google Sheets.`, 'warning');
+      showToast(`Đã xóa ${jobId} và đồng bộ lại Google Sheets.`, 'success');
     } catch (err) {
       console.error('Không thể xóa tin tuyển dụng trên Google Sheets:', err);
-      showToast('Xóa thất bại. Kiểm tra webhook Job Management trong n8n.', 'error');
+      showToast('Lỗi khi gọi n8n xóa tin tuyển dụng.', 'error');
     }
   };
 
@@ -361,14 +222,6 @@ export default function App() {
     e.preventDefault();
     if (!jobForm.job_id || !jobForm.job_title || !jobForm.required_skills) {
       showToast('Vui lòng điền mã tin, tiêu đề và kỹ năng bắt buộc!', 'error');
-      return;
-    }
-
-    const duplicateId = jobs.some(j =>
-      j.job_id === jobForm.job_id && (!editingJob || j.job_id !== editingJob.job_id)
-    );
-    if (duplicateId) {
-      showToast('Mã tin tuyển dụng đã tồn tại. Vui lòng chọn mã khác.', 'error');
       return;
     }
 
@@ -389,7 +242,7 @@ export default function App() {
       showToast(editingJob ? 'Đã cập nhật tin tuyển dụng trên Google Sheets.' : 'Đã thêm tin tuyển dụng vào Google Sheets.');
     } catch (err) {
       console.error('Không thể lưu tin tuyển dụng lên Google Sheets:', err);
-      showToast('Lưu tin thất bại. Kiểm tra webhook Job Management trong n8n.', 'error');
+      showToast('Lỗi kết nối n8n khi lưu tin tuyển dụng.', 'error');
     }
   };
 
@@ -403,10 +256,6 @@ export default function App() {
     const isPdf = applyFile.type === 'application/pdf' || applyFile.name.toLowerCase().endsWith('.pdf');
     if (!isPdf) {
       showToast('File tải lên phải có định dạng PDF.', 'error');
-      return;
-    }
-    if (applyFile.size > 10 * 1024 * 1024) {
-      showToast('Dung lượng CV không được vượt quá 10MB.', 'error');
       return;
     }
 
@@ -426,15 +275,15 @@ export default function App() {
 
       if (!response.ok) throw new Error(`Server response status: ${response.status}`);
 
-      showToast('Nộp CV thành công! Hệ thống đang phân tích hồ sơ.');
+      showToast('Nộp CV thành công! AI đang phân tích và cập nhật Google Sheets.');
       setShowApplyModal(false);
       setApplyFile(null);
       setSelectedJob(null);
-      fetchSheetData();
+      setTimeout(fetchSheetData, 2000); // Tự động đồng bộ lại sau 2 giây
 
     } catch (err) {
-      console.warn('Kết nối n8n Webhook thất bại:', err);
-      showToast('Không thể gửi CV. Vui lòng kiểm tra kết nối n8n và thử lại.', 'error');
+      console.error('Kết nối n8n Webhook thất bại:', err);
+      showToast('Không thể gửi CV qua n8n. Kiểm tra lại Workflow 1!', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -476,22 +325,11 @@ export default function App() {
 
       if (!res.ok) throw new Error(`Server response status: ${res.status}`);
 
-      setMatchResults(prev => prev.map((row, index) => {
-        if (getMatchRowKey(row, index) !== rowKey) return row;
-        return {
-          ...row,
-          'Quyết định của HR': status,
-          'Ngày phỏng vấn': status === 'Approve' ? schedule.date : '-',
-          'Giờ phỏng vấn': status === 'Approve' ? schedule.time : '-',
-          'Google Meet': generatedMeetLink,
-          'Trạng thái gửi email cho ứng viên': 'Đã gửi'
-        };
-      }));
-      showToast(`Đã duyệt hồ sơ và tạo Google Meet thành công!`);
-      await fetchSheetData();
+      showToast(`Đã gửi quyết định ${status} qua n8n thành công!`);
+      setTimeout(fetchSheetData, 1500);
     } catch (err) {
-      console.warn('Lỗi gọi n8n HR Decision Webhook:', err);
-      showToast('Không thể gửi quyết định. Dữ liệu chưa được cập nhật.', 'error');
+      console.error('Lỗi gọi n8n HR Decision Webhook:', err);
+      showToast('Lỗi kết nối n8n khi gửi quyết định HR.', 'error');
     }
   };
 
@@ -550,46 +388,52 @@ export default function App() {
                 onClick={fetchSheetData}
                 className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold px-3 py-1.5 rounded-lg border border-sky-200 transition flex items-center gap-1"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Đồng bộ dữ liệu
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Đồng bộ Google Sheets
               </button>
             </div>
           </div>
 
           <div className="grid gap-5">
-            {filteredJobs.map(job => (
-              <div 
-                key={job.job_id} 
-                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md border border-slate-200 hover:border-sky-300 transition-all group"
-              >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-sky-600 text-white px-2.5 py-0.5 rounded-md text-xs font-mono font-bold">{job.job_id}</span>
-                      <span className="bg-sky-50 text-sky-800 px-3 py-0.5 rounded-md text-xs font-bold border border-sky-200">{job.work_type}</span>
-                      <span className="bg-emerald-50 text-emerald-700 px-3 py-0.5 rounded-md text-xs font-bold border border-emerald-200">{job.status === 'Open' ? 'Đang tuyển' : 'Đã đóng'}</span>
+            {filteredJobs.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 text-center border border-slate-200 text-slate-500">
+                Chưa có dữ liệu vị trí tuyển dụng nào từ Google Sheets. Hãy bấm nút **Đồng bộ Google Sheets** ở góc trên!
+              </div>
+            ) : (
+              filteredJobs.map(job => (
+                <div 
+                  key={job.job_id} 
+                  className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md border border-slate-200 hover:border-sky-300 transition-all group"
+                >
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-sky-600 text-white px-2.5 py-0.5 rounded-md text-xs font-mono font-bold">{job.job_id}</span>
+                        <span className="bg-sky-50 text-sky-800 px-3 py-0.5 rounded-md text-xs font-bold border border-sky-200">{job.work_type}</span>
+                        <span className="bg-emerald-50 text-emerald-700 px-3 py-0.5 rounded-md text-xs font-bold border border-emerald-200">{job.status === 'Open' ? 'Đang tuyển' : 'Đã đóng'}</span>
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition">{job.job_title}</h3>
+                      <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm text-slate-600 font-medium">
+                        <span className="flex items-center gap-1"><Clock className="w-4 h-4 text-slate-400" /> Hạn nộp: {job.deadline}</span>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition">{job.job_title}</h3>
-                    <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm text-slate-600 font-medium">
-                      <span className="flex items-center gap-1"><Clock className="w-4 h-4 text-slate-400" /> Hạn nộp: {job.deadline}</span>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button 
+                        onClick={() => setSelectedJob(job)}
+                        className="px-4 py-2.5 text-slate-700 hover:bg-slate-100 rounded-xl text-sm font-bold border border-slate-200 transition"
+                      >
+                        Chi tiết
+                      </button>
+                      <button 
+                        onClick={() => { setSelectedJob(job); setShowApplyModal(true); }}
+                        className="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-1.5"
+                      >
+                        <Upload className="w-4 h-4" /> Ứng Tuyển
+                      </button>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <button 
-                      onClick={() => setSelectedJob(job)}
-                      className="px-4 py-2.5 text-slate-700 hover:bg-slate-100 rounded-xl text-sm font-bold border border-slate-200 transition"
-                    >
-                      Chi tiết
-                    </button>
-                    <button 
-                      onClick={() => { setSelectedJob(job); setShowApplyModal(true); }}
-                      className="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-1.5"
-                    >
-                      <Upload className="w-4 h-4" /> Ứng Tuyển
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -713,7 +557,7 @@ export default function App() {
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 leading-tight">Quản lý tuyển dụng</h2>
-                <p className="text-[11px] text-slate-500">Theo dõi tin tuyển dụng, hồ sơ và kết quả đánh giá ứng viên</p>
+                <p className="text-[11px] text-slate-500">Đồng bộ trực tiếp 100% từ Google Sheets qua n8n</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -725,9 +569,9 @@ export default function App() {
               </button>
               <button
                 onClick={fetchSheetData}
-                className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 transition"
+                className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 transition shadow-sm"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Làm mới
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Đồng bộ Google Sheets
               </button>
             </div>
           </div>
@@ -768,7 +612,7 @@ export default function App() {
                   <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                     <Briefcase className="w-5 h-5 text-sky-600" /> Quản lý tin tuyển dụng
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">Thêm, chỉnh sửa và quản lý trạng thái các vị trí tuyển dụng</p>
+                  <p className="text-xs text-slate-500 mt-1">Thêm, chỉnh sửa và quản lý trạng thái các vị trí tuyển dụng trên Google Sheets</p>
                 </div>
                 <button 
                   onClick={handleOpenAddJob}
@@ -793,32 +637,40 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {jobs.map(j => (
-                        <tr key={j.job_id} className="hover:bg-slate-50 transition">
-                          <td className="px-4 py-3 font-mono font-bold text-sky-600">{j.job_id}</td>
-                          <td className="px-4 py-3 font-bold text-slate-900 text-sm">{j.job_title}</td>
-                          <td className="px-4 py-3 max-w-xs truncate text-slate-600">{j.required_skills}</td>
-                          <td className="px-4 py-3 text-slate-600">{j.work_type}</td>
-                          <td className="px-4 py-3 text-slate-600">{j.deadline}</td>
-                          <td className="px-4 py-3 font-bold text-emerald-600">{j.status === 'Open' ? 'Đang tuyển' : 'Đã đóng'}</td>
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <button 
-                                onClick={() => handleOpenEditJob(j)}
-                                className="bg-sky-50 hover:bg-sky-100 text-sky-700 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-sky-200"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" /> Sửa
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteJob(j.job_id)}
-                                className="bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-rose-200"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" /> Xóa
-                              </button>
-                            </div>
+                      {jobs.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" className="px-4 py-6 text-center text-slate-400 italic">
+                            Chưa có bài đăng nào. Bấm **Đồng bộ Google Sheets** để tải dữ liệu lên.
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        jobs.map(j => (
+                          <tr key={j.job_id} className="hover:bg-slate-50 transition">
+                            <td className="px-4 py-3 font-mono font-bold text-sky-600">{j.job_id}</td>
+                            <td className="px-4 py-3 font-bold text-slate-900 text-sm">{j.job_title}</td>
+                            <td className="px-4 py-3 max-w-xs truncate text-slate-600">{j.required_skills}</td>
+                            <td className="px-4 py-3 text-slate-600">{j.work_type}</td>
+                            <td className="px-4 py-3 text-slate-600">{j.deadline}</td>
+                            <td className="px-4 py-3 font-bold text-emerald-600">{j.status === 'Open' ? 'Đang tuyển' : 'Đã đóng'}</td>
+                            <td className="px-4 py-3 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button 
+                                  onClick={() => handleOpenEditJob(j)}
+                                  className="bg-sky-50 hover:bg-sky-100 text-sky-700 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-sky-200"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" /> Sửa
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteJob(j.job_id)}
+                                  className="bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-rose-200"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Xóa
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -827,7 +679,7 @@ export default function App() {
               <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <div className="px-5 py-3.5 border-b border-slate-200 bg-sky-50/50 flex justify-between items-center">
                   <h3 className="font-bold text-xs uppercase tracking-wider text-sky-800 flex items-center gap-2">
-                    <FileSpreadsheet className="w-4 h-4 text-sky-600" /> Hồ sơ ứng viên đã tiếp nhận
+                    <FileSpreadsheet className="w-4 h-4 text-sky-600" /> Hồ sơ ứng viên đã tiếp nhận (Danh sách ứng viên - CV Parser)
                   </h3>
                 </div>
                 <div className="overflow-x-auto">
@@ -844,26 +696,34 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {parserCandidates.map((c, idx) => {
-                        const emailKey = c["Email"] || 'no-email';
-                        const jobIdKey = c.job_id || '';
-                        const timeKey = c["Thời gian nộp"] || idx;
-                        const rowKey = `${emailKey}-${jobIdKey}-${timeKey}-${idx}`;
-                        return (
-                          <tr key={rowKey} className="hover:bg-slate-50 transition">
-                            <td className="px-4 py-3 font-bold text-slate-900 text-sm">{c["Họ và tên"]}</td>
-                            <td className="px-4 py-3">
-                              <div className="font-bold text-slate-800">{c["Email"]}</div>
-                              <div className="text-[11px] text-slate-400 font-mono">{c["Số điện thoại"]}</div>
-                            </td>
-                            <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Kỹ năng"]}</td>
-                            <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Học Vấn"]}</td>
-                            <td className="px-4 py-3 text-sky-700 font-bold">{c["Vị trí ứng tuyển"]} ({c["job_id"]})</td>
-                            <td className="px-4 py-3 text-slate-400 font-mono">{c["Thời gian nộp"]}</td>
-                            <td className="px-4 py-3 font-bold text-emerald-600">{c["Trạng thái gửi email cho HR"]}</td>
-                          </tr>
-                        );
-                      })}
+                      {parserCandidates.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" className="px-4 py-6 text-center text-slate-400 italic">
+                            Chưa có hồ sơ ứng viên nào trong Google Sheets.
+                          </td>
+                        </tr>
+                      ) : (
+                        parserCandidates.map((c, idx) => {
+                          const emailKey = c["Email"] || 'no-email';
+                          const jobIdKey = c.job_id || '';
+                          const timeKey = c["Thời gian nộp"] || idx;
+                          const rowKey = `${emailKey}-${jobIdKey}-${timeKey}-${idx}`;
+                          return (
+                            <tr key={rowKey} className="hover:bg-slate-50 transition">
+                              <td className="px-4 py-3 font-bold text-slate-900 text-sm">{c["Họ và tên"]}</td>
+                              <td className="px-4 py-3">
+                                <div className="font-bold text-slate-800">{c["Email"]}</div>
+                                <div className="text-[11px] text-slate-400 font-mono">{c["Số điện thoại"]}</div>
+                              </td>
+                              <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Kỹ năng"]}</td>
+                              <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Học Vấn"]}</td>
+                              <td className="px-4 py-3 text-sky-700 font-bold">{c["Vị trí ứng tuyển"]} ({c["job_id"]})</td>
+                              <td className="px-4 py-3 text-slate-400 font-mono">{c["Thời gian nộp"]}</td>
+                              <td className="px-4 py-3 font-bold text-emerald-600">{c["Trạng thái gửi email cho HR"]}</td>
+                            </tr>
+                          );
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -876,7 +736,7 @@ export default function App() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-sky-100 shadow-sm">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Bot className="w-5 h-5 text-sky-600" /> Kết quả đánh giá mức độ phù hợp
+                    <Bot className="w-5 h-5 text-sky-600" /> Kết quả đánh giá mức độ phù hợp (CV_Match_Results)
                   </h2>
                   <p className="text-xs text-slate-500 mt-1">Phân tích kỹ năng trong CV và đối chiếu với yêu cầu của từng vị trí tuyển dụng</p>
                 </div>
@@ -895,34 +755,42 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {matchResults.map((c, idx) => (
-                        <tr key={getMatchRowKey(c, idx)} className="hover:bg-slate-50 transition">
-                          <td className="px-4 py-4">
-                            <div className="font-bold text-slate-900 text-sm">{c["Họ và tên ứng viên"]}</div>
-                            <div className="text-[11px] text-slate-400 font-mono">{c["Email ứng viên"]}</div>
-                            <div className="text-[11px] text-sky-600 font-bold mt-0.5">{c["Tên vị trí tuyển dụng"]}</div>
-                          </td>
-                          <td className="px-4 py-4 text-center">
-                            <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl border font-bold text-sm ${
-                              c["Điểm phù hợp"] >= 8 ? 'border-emerald-300 text-emerald-700 bg-emerald-50' :
-                              c["Điểm phù hợp"] >= 6 ? 'border-amber-300 text-amber-700 bg-amber-50' :
-                              'border-rose-300 text-rose-700 bg-rose-50'
-                            }`}>
-                              {Number(c["Điểm phù hợp"] || 0).toFixed(1)}
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 font-bold text-slate-800">{c["Đề xuất đánh giá"]}</td>
-                          <td className="px-4 py-4 max-w-xs">
-                            <div className="text-emerald-700 font-semibold mb-0.5"> Khớp: {c["Kỹ năng bắt buộc phù hợp"]}</div>
-                            <div className="text-rose-600 font-semibold"> Thiếu: {c["Kỹ năng bắt buộc còn thiếu"]}</div>
-                          </td>
-                          <td className="px-4 py-4 max-w-xs">
-                            <p className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-[11px] text-slate-600 leading-relaxed">
-                              {c["Lý do đánh giá"]}
-                            </p>
+                      {matchResults.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" className="px-4 py-6 text-center text-slate-400 italic">
+                            Chưa có kết quả đánh giá AI nào từ Google Sheets.
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        matchResults.map((c, idx) => (
+                          <tr key={getMatchRowKey(c, idx)} className="hover:bg-slate-50 transition">
+                            <td className="px-4 py-4">
+                              <div className="font-bold text-slate-900 text-sm">{c["Họ và tên ứng viên"]}</div>
+                              <div className="text-[11px] text-slate-400 font-mono">{c["Email ứng viên"]}</div>
+                              <div className="text-[11px] text-sky-600 font-bold mt-0.5">{c["Tên vị trí tuyển dụng"]}</div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl border font-bold text-sm ${
+                                c["Điểm phù hợp"] >= 8 ? 'border-emerald-300 text-emerald-700 bg-emerald-50' :
+                                c["Điểm phù hợp"] >= 6 ? 'border-amber-300 text-amber-700 bg-amber-50' :
+                                'border-rose-300 text-rose-700 bg-rose-50'
+                              }`}>
+                                {Number(c["Điểm phù hợp"] || 0).toFixed(1)}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 font-bold text-slate-800">{c["Đề xuất đánh giá"]}</td>
+                            <td className="px-4 py-4 max-w-xs">
+                              <div className="text-emerald-700 font-semibold mb-0.5">Khớp: {c["Kỹ năng bắt buộc phù hợp"]}</div>
+                              <div className="text-rose-600 font-semibold">Thiếu: {c["Kỹ năng bắt buộc còn thiếu"]}</div>
+                            </td>
+                            <td className="px-4 py-4 max-w-xs">
+                              <p className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-[11px] text-slate-600 leading-relaxed">
+                                {c["Lý do đánh giá"]}
+                              </p>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -938,7 +806,7 @@ export default function App() {
                     <UserCheck className="w-5 h-5 text-sky-600" /> Duyệt hồ sơ, xếp lịch & Google Meet
                   </h2>
                   <p className="text-xs text-slate-500 mt-1">
-                    Chọn quyết định tuyển dụng. Khi duyệt, hãy chọn ngày và giờ phỏng vấn để hệ thống tạo lịch và link Google Meet tự động.
+                    Chọn quyết định tuyển dụng. Khi duyệt, hãy chọn ngày và giờ phỏng vấn để hệ thống gọi n8n WF3 tạo lịch và link Google Meet tự động.
                   </p>
                 </div>
               </div>
@@ -957,108 +825,116 @@ export default function App() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 text-slate-700">
-                          {matchResults.map((c, idx) => {
-                            const rowKey = getMatchRowKey(c, idx);
-                            return (
-                            <tr key={rowKey} className="hover:bg-slate-50 transition">
-                              <td className="px-4 py-4">
-                                <div className="font-bold text-slate-900 text-sm">{c["Họ và tên ứng viên"]}</div>
-                                <div className="text-[11px] text-slate-400 font-mono">{c["Email ứng viên"]}</div>
-                                <div className="text-[11px] text-sky-600 font-bold mt-0.5">Điểm AI: {Number(c["Điểm phù hợp"] || 0).toFixed(1)}/10</div>
-                              </td>
-
-                              <td className="px-4 py-4 text-center">
-                                {c["Quyết định của HR"] === 'Pending Review' ? (
-                                  <div className="flex items-center justify-center gap-2">
-                                    <button 
-                                      onClick={() => handleHRDecision(c, rowKey, 'Approve')}
-                                      disabled={!c["Email ứng viên"] || !(interviewSchedules[rowKey] || {}).date || !(interviewSchedules[rowKey] || {}).time}
-                                      className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm cursor-pointer"
-                                    >
-                                      <Check className="w-3.5 h-3.5" /> Duyệt & Tạo Meet
-                                    </button>
-                                    <button 
-                                      onClick={() => handleHRDecision(c, rowKey, 'Reject')}
-                                      disabled={!c["Email ứng viên"]}
-                                      className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm cursor-pointer"
-                                    >
-                                      <X className="w-3.5 h-3.5" /> Từ chối
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <span className={`inline-flex items-center gap-1 font-bold text-xs px-3 py-1 rounded-full border ${
-                                    c["Quyết định của HR"] === 'Approve' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-800 border-rose-200'
-                                  }`}>
-                                    {c["Quyết định của HR"] === 'Approve' ? <Check className="w-3 h-3"/> : <X className="w-3 h-3"/>}
-                                    {c["Quyết định của HR"] === 'Approve' ? 'Approve' : 'Reject'}
-                                  </span>
-                                )}
-                              </td>
-
-                              <td className="px-4 py-4 font-mono font-semibold text-slate-700">
-                                {c["Quyết định của HR"] === 'Pending Review' ? (
-                                  <div className="flex flex-col gap-2 min-w-[145px]">
-                                    <input
-                                      type="date"
-                                      min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10)}
-                                      value={(interviewSchedules[rowKey] || {}).date || ''}
-                                      onChange={(e) => setInterviewSchedules(prev => ({
-                                        ...prev,
-                                        [rowKey]: {
-                                          ...(prev[rowKey] || {}),
-                                          date: e.target.value
-                                        }
-                                      }))}
-                                      className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs"
-                                      aria-label="Ngày phỏng vấn"
-                                    />
-                                    <input
-                                      type="time"
-                                      value={(interviewSchedules[rowKey] || {}).time || ''}
-                                      onChange={(e) => setInterviewSchedules(prev => ({
-                                        ...prev,
-                                        [rowKey]: {
-                                          ...(prev[rowKey] || {}),
-                                          time: e.target.value
-                                        }
-                                      }))}
-                                      className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs"
-                                      aria-label="Giờ phỏng vấn"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="space-y-1">
-                                    <span>{c["Ngày phỏng vấn"] || '-'} lúc {c["Giờ phỏng vấn"] || '-'}</span>
-                                    {c["Google Meet"] ? (
-                                      <div>
-                                        <a 
-                                          href={c["Google Meet"]} 
-                                          target="_blank" 
-                                          rel="noopener noreferrer" 
-                                          className="inline-flex items-center gap-1 text-[11px] text-sky-600 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200 hover:bg-sky-100 transition"
-                                        >
-                                          <Video className="w-3 h-3 text-sky-500" /> Vào phòng Google Meet
-                                        </a>
-                                      </div>
-                                    ) : (
-                                      <div className="text-slate-400 italic text-[10px]">Chưa có link Meet</div>
-                                    )}
-                                  </div>
-                                )}
-                              </td>
-
-                              <td className="px-4 py-4 text-xs font-bold">
-                                {c["Trạng thái gửi email cho ứng viên"] === 'Đã gửi' ? (
-                                  <span className="text-emerald-700 flex items-center gap-1">
-                                    <Mail className="w-3.5 h-3.5 text-emerald-600" /> Đã gửi email
-                                  </span>
-                                ) : (
-                                  <span className="text-slate-400 italic">Chưa gửi</span>
-                                )}
+                          {matchResults.length === 0 ? (
+                            <tr>
+                              <td colSpan="4" className="px-4 py-6 text-center text-slate-400 italic">
+                                Chưa có hồ sơ nào để duyệt.
                               </td>
                             </tr>
-                          );
-                          })}
+                          ) : (
+                            matchResults.map((c, idx) => {
+                              const rowKey = getMatchRowKey(c, idx);
+                              return (
+                              <tr key={rowKey} className="hover:bg-slate-50 transition">
+                                <td className="px-4 py-4">
+                                  <div className="font-bold text-slate-900 text-sm">{c["Họ và tên ứng viên"]}</div>
+                                  <div className="text-[11px] text-slate-400 font-mono">{c["Email ứng viên"]}</div>
+                                  <div className="text-[11px] text-sky-600 font-bold mt-0.5">Điểm AI: {Number(c["Điểm phù hợp"] || 0).toFixed(1)}/10</div>
+                                </td>
+
+                                <td className="px-4 py-4 text-center">
+                                  {c["Quyết định của HR"] === 'Pending Review' ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                      <button 
+                                        onClick={() => handleHRDecision(c, rowKey, 'Approve')}
+                                        disabled={!c["Email ứng viên"] || !(interviewSchedules[rowKey] || {}).date || !(interviewSchedules[rowKey] || {}).time}
+                                        className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm cursor-pointer"
+                                      >
+                                        <Check className="w-3.5 h-3.5" /> Duyệt & Tạo Meet
+                                      </button>
+                                      <button 
+                                        onClick={() => handleHRDecision(c, rowKey, 'Reject')}
+                                        disabled={!c["Email ứng viên"]}
+                                        className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm cursor-pointer"
+                                      >
+                                        <X className="w-3.5 h-3.5" /> Từ chối
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <span className={`inline-flex items-center gap-1 font-bold text-xs px-3 py-1 rounded-full border ${
+                                      c["Quyết định của HR"] === 'Approve' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-800 border-rose-200'
+                                    }`}>
+                                      {c["Quyết định của HR"] === 'Approve' ? <Check className="w-3 h-3"/> : <X className="w-3 h-3"/>}
+                                      {c["Quyết định của HR"] === 'Approve' ? 'Approve' : 'Reject'}
+                                    </span>
+                                  )}
+                                </td>
+
+                                <td className="px-4 py-4 font-mono font-semibold text-slate-700">
+                                  {c["Quyết định của HR"] === 'Pending Review' ? (
+                                    <div className="flex flex-col gap-2 min-w-[145px]">
+                                      <input
+                                        type="date"
+                                        min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10)}
+                                        value={(interviewSchedules[rowKey] || {}).date || ''}
+                                        onChange={(e) => setInterviewSchedules(prev => ({
+                                          ...prev,
+                                          [rowKey]: {
+                                            ...(prev[rowKey] || {}),
+                                            date: e.target.value
+                                          }
+                                        }))}
+                                        className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs"
+                                        aria-label="Ngày phỏng vấn"
+                                      />
+                                      <input
+                                        type="time"
+                                        value={(interviewSchedules[rowKey] || {}).time || ''}
+                                        onChange={(e) => setInterviewSchedules(prev => ({
+                                          ...prev,
+                                          [rowKey]: {
+                                            ...(prev[rowKey] || {}),
+                                            time: e.target.value
+                                          }
+                                        }))}
+                                        className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs"
+                                        aria-label="Giờ phỏng vấn"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-1">
+                                      <span>{c["Ngày phỏng vấn"] || '-'} lúc {c["Giờ phỏng vấn"] || '-'}</span>
+                                      {c["Google Meet"] ? (
+                                        <div>
+                                          <a 
+                                            href={c["Google Meet"]} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="inline-flex items-center gap-1 text-[11px] text-sky-600 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200 hover:bg-sky-100 transition"
+                                          >
+                                            <Video className="w-3 h-3 text-sky-500" /> Vào phòng Google Meet
+                                          </a>
+                                        </div>
+                                      ) : (
+                                        <div className="text-slate-400 italic text-[10px]">Chưa có link Meet</div>
+                                      )}
+                                    </div>
+                                  )}
+                                </td>
+
+                                <td className="px-4 py-4 text-xs font-bold">
+                                  {c["Trạng thái gửi email cho ứng viên"] === 'Đã gửi' ? (
+                                    <span className="text-emerald-700 flex items-center gap-1">
+                                      <Mail className="w-3.5 h-3.5 text-emerald-600" /> Đã gửi email
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-400 italic">Chưa gửi</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                            })
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -1071,13 +947,17 @@ export default function App() {
                       <Inbox className="w-4 h-4 text-rose-500" /> Trạng thái email ứng viên
                     </h3>
                     <div className="space-y-2 text-xs">
-                      {matchResults.filter(c => c["Trạng thái gửi email cho ứng viên"] === 'Đã gửi').map((c, idx) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                          <p className="font-bold text-slate-900 truncate">{c["Họ và tên ứng viên"]}</p>
-                          <p className="text-[11px] text-slate-500">{c["Email ứng viên"]}</p>
-                          <p className="text-[10px] text-emerald-600 font-bold mt-1">Trạng thái: Đã gửi</p>
-                        </div>
-                      ))}
+                      {matchResults.filter(c => c["Trạng thái gửi email cho ứng viên"] === 'Đã gửi').length === 0 ? (
+                        <p className="text-slate-400 italic text-[11px]">Chưa có email nào được gửi.</p>
+                      ) : (
+                        matchResults.filter(c => c["Trạng thái gửi email cho ứng viên"] === 'Đã gửi').map((c, idx) => (
+                          <div key={idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <p className="font-bold text-slate-900 truncate">{c["Họ và tên ứng viên"]}</p>
+                            <p className="text-[11px] text-slate-500">{c["Email ứng viên"]}</p>
+                            <p className="text-[10px] text-emerald-600 font-bold mt-1">Trạng thái: Đã gửi</p>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
 
@@ -1086,17 +966,21 @@ export default function App() {
                       <CalendarIcon className="w-4 h-4 text-sky-600" /> Lịch phỏng vấn đã duyệt
                     </h3>
                     <div className="space-y-2 text-xs">
-                      {matchResults.filter(c => c["Quyết định của HR"] === 'Approve').map((c, idx) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-sky-50/60 border border-sky-100 border-l-4 border-l-sky-500 space-y-1">
-                          <p className="font-bold text-slate-900">{c["Họ và tên ứng viên"]} - {c["Tên vị trí tuyển dụng"]}</p>
-                          <p className="text-slate-600">{c["Ngày phỏng vấn"]} lúc {c["Giờ phỏng vấn"]}</p>
-                          {c["Google Meet"] && (
-                            <a href={c["Google Meet"]} target="_blank" rel="noopener noreferrer" className="text-[11px] text-sky-600 font-bold underline block">
-                              Link Google Meet
-                            </a>
-                          )}
-                        </div>
-                      ))}
+                      {matchResults.filter(c => c["Quyết định của HR"] === 'Approve').length === 0 ? (
+                        <p className="text-slate-400 italic text-[11px]">Chưa có lịch phỏng vấn nào được duyệt.</p>
+                      ) : (
+                        matchResults.filter(c => c["Quyết định của HR"] === 'Approve').map((c, idx) => (
+                          <div key={idx} className="p-2.5 rounded-xl bg-sky-50/60 border border-sky-100 border-l-4 border-l-sky-500 space-y-1">
+                            <p className="font-bold text-slate-900">{c["Họ và tên ứng viên"]} - {c["Tên vị trí tuyển dụng"]}</p>
+                            <p className="text-slate-600">{c["Ngày phỏng vấn"]} lúc {c["Giờ phỏng vấn"]}</p>
+                            {c["Google Meet"] && (
+                              <a href={c["Google Meet"]} target="_blank" rel="noopener noreferrer" className="text-[11px] text-sky-600 font-bold underline block">
+                                Link Google Meet
+                              </a>
+                            )}
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1136,7 +1020,7 @@ export default function App() {
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Webhook Job Management (POST - thêm/sửa/xóa tin):</label>
+                  <label className="block font-bold text-slate-700 mb-1">Webhook Job Management (POST):</label>
                   <input
                     type="text"
                     value={jobWebhookUrl}
@@ -1175,7 +1059,7 @@ export default function App() {
               <h3 className="text-2xl font-bold text-slate-900 mb-1">
                 {editingJob ? `Chỉnh Sửa Vị Trí: ${editingJob.job_id}` : 'Thêm Bài Đăng Tuyển Dụng Mới'}
               </h3>
-              <p className="text-xs text-slate-500 font-medium mb-6">Thông tin vị trí tuyển dụng</p>
+              <p className="text-xs text-slate-500 font-medium mb-6">Thông tin vị trí tuyển dụng trên Google Sheets</p>
 
               <form onSubmit={handleSaveJob} className="space-y-4 text-xs font-bold text-slate-700">
                 <div className="grid grid-cols-2 gap-3">
