@@ -231,7 +231,7 @@ export default function App() {
   // Webhook Endpoints
   const [webhookUrl, setWebhookUrl] = useState('http://localhost:5678/webhook/upload-cv');
   const [hrWebhookUrl, setHrWebhookUrl] = useState('http://localhost:5678/webhook/hr-decision');
-  const [getDataUrl, setGetDataUrl] = useState('http://localhost:5678/webhook/get-sheet-data');
+  const [getDataUrl, setGetDataUrl] = useState('http://localhost:5678/webhook/sync-sheets');
   const [jobWebhookUrl, setJobWebhookUrl] = useState('http://localhost:5678/webhook/job-management');
   const [showConfigModal, setShowConfigModal] = useState(false);
 
