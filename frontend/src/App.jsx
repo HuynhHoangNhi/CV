@@ -18,7 +18,7 @@ const initialJobs = [
     preferred_skills: 'Docker, Redis, Microservices, CI/CD',
     work_type: 'Full-time',
     benefits: 'Được hướng dẫn chuyên môn, tham gia dự án thực tế, bảo hiểm.',
-    deadline: '2026-12-31',
+    deadline: '2026-10-11',
     status: 'Open'
   },
   {
@@ -30,7 +30,7 @@ const initialJobs = [
     preferred_skills: 'Power BI, Tableau, Pandas, Statistics, Machine Learning',
     work_type: 'Full-time',
     benefits: 'Được hướng dẫn chuyên môn, tham gia dự án phân tích dữ liệu thực tế, cơ hội đào tạo và phát triển nghề nghiệp, bảo hiểm.',
-    deadline: '2026-12-31',
+    deadline: '2026-10-11',
     status: 'Open'
   },
   {
@@ -42,7 +42,7 @@ const initialJobs = [
     preferred_skills: 'SEO, Canva, Digital Marketing, Google Analytics, Event Planning',
     work_type: 'Full-time',
     benefits: 'Được hướng dẫn chuyên môn, tham gia các chiến dịch truyền thông thực tế, cơ hội đào tạo và phát triển nghề nghiệp, bảo hiểm.',
-    deadline: '2026-12-31',
+    deadline: '2026-10-11',
     status: 'Open'
   }
 ];
@@ -103,7 +103,6 @@ const initialMatchResults = [
     "Quyết định của HR": "Approve",
     "Ngày phỏng vấn": "2026-11-14",
     "Giờ phỏng vấn": "07:30",
-    "Google Meet": "https://meet.google.com/abc-defg-hij",
     "Trạng thái gửi email cho ứng viên": "Đã gửi"
   },
   {
@@ -118,11 +117,10 @@ const initialMatchResults = [
     "Kỹ năng bắt buộc còn thiếu": "Data Analysis, Data Visualization",
     "Kỹ năng ưu tiên phù hợp": "Power BI, Tableau, Pandas",
     "Kỹ năng ưu tiên còn thiếu": "Statistics, Machine Learning",
-    "Lý do đánh giá": "Đáp ứng 3/5 kỹ năng bắt buộc. Đáp ứng 3/5 kỹ năng ưu tiên.",
+    "Lý do đánh giá": "Đáp ứng 3/5 kỹ năng bắt buộc. Đáp ứng 3/5 kỹ năng ưu tiên. Kỹ năng bắt buộc cần kiểm tra thêm: Data Analysis, Data Visualization.",
     "Quyết định của HR": "Reject",
     "Ngày phỏng vấn": "-",
     "Giờ phỏng vấn": "-",
-    "Google Meet": "",
     "Trạng thái gửi email cho ứng viên": "Đã gửi"
   },
   {
@@ -137,109 +135,29 @@ const initialMatchResults = [
     "Kỹ năng bắt buộc còn thiếu": "Social Media, Communication, Marketing Planning",
     "Kỹ năng ưu tiên phù hợp": "SEO, Canva, Digital Marketing, Google Analytics",
     "Kỹ năng ưu tiên còn thiếu": "Event Planning",
-    "Lý do đánh giá": "Đáp ứng 2/5 kỹ năng bắt buộc. Đáp ứng 4/5 kỹ năng ưu tiên.",
+    "Lý do đánh giá": "Đáp ứng 2/5 kỹ năng bắt buộc. Đáp ứng 4/5 kỹ năng ưu tiên. Kỹ năng bắt buộc cần kiểm tra thêm: Social Media, Communication, Marketing Planning.",
     "Quyết định của HR": "Pending Review",
     "Ngày phỏng vấn": "-",
     "Giờ phỏng vấn": "-",
-    "Google Meet": "",
     "Trạng thái gửi email cho ứng viên": "Chưa gửi"
   }
 ];
 
-// --- CHUẨN HÓA DỮ LIỆU ĐỌC TỪ 3 SHEET GOOGLE SHEETS ---
-const toSheetDate = (value) => {
-  if (!value) return '';
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    const local = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
-    return local.toISOString().slice(0, 10);
-  }
-  const raw = String(value).trim();
-  if (!raw) return '';
-  const iso = raw.match(/^(\d{4}-\d{2}-\d{2})/);
-  if (iso) return iso[1];
-  const vn = raw.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
-  if (vn) return `${vn[3]}-${vn[2].padStart(2, '0')}-${vn[1].padStart(2, '0')}`;
-  return raw;
-};
-
-const normalizePhone = (value) => {
-  if (value === null || value === undefined || value === '') return '';
-  const digits = String(value).replace(/\D/g, '');
-  return digits.length === 9 ? `0${digits}` : digits;
-};
-
-const normalizeJobRow = (row) => ({
-  ...row,
-  job_id: String(row.job_id || ''),
-  job_title: row.job_title || '',
-  job_description: row.job_description || '',
-  required_skills: row.required_skills || '',
-  required_experience: row.required_experience || '',
-  preferred_skills: row.preferred_skills || '',
-  work_type: row.work_type || '',
-  benefits: row.benefits || '',
-  deadline: toSheetDate(row.deadline),
-  status: row.status || 'Open'
-});
-
-const normalizeCandidateRow = (row) => ({
-  ...row,
-  'Họ và tên': row['Họ và tên'] || '',
-  'Email': row['Email'] || '',
-  'Số điện thoại': normalizePhone(row['Số điện thoại']),
-  'Kỹ năng': row['Kỹ năng'] || '',
-  'Kinh nghiệm': row['Kinh nghiệm'] || '',
-  'Học Vấn': row['Học Vấn'] || '',
-  'Vị trí ứng tuyển': row['Vị trí ứng tuyển'] || '',
-  'Thời gian nộp': row['Thời gian nộp'] || '',
-  'job_id': row.job_id || '',
-  'Trạng thái gửi email cho HR': row['Trạng thái gửi email cho HR'] || 'Chưa gửi'
-});
-
-const normalizeMatchRow = (row) => ({
-  ...row,
-  'Họ và tên ứng viên': row['Họ và tên ứng viên'] || '',
-  'Email ứng viên': row['Email ứng viên'] || '',
-  'Vị trí ứng tuyển': row['Vị trí ứng tuyển'] || '',
-  'Mã tin tuyển dụng': row['Mã tin tuyển dụng'] || '',
-  'Tên vị trí tuyển dụng': row['Tên vị trí tuyển dụng'] || '',
-  'Điểm phù hợp': Number(row['Điểm phù hợp'] ?? 0),
-  'Đề xuất đánh giá': row['Đề xuất đánh giá'] || '',
-  'Kỹ năng bắt buộc phù hợp': row['Kỹ năng bắt buộc phù hợp'] || 'Không có dữ liệu',
-  'Kỹ năng bắt buộc còn thiếu': row['Kỹ năng bắt buộc còn thiếu'] || 'Không',
-  'Kỹ năng ưu tiên phù hợp': row['Kỹ năng ưu tiên phù hợp'] || 'Không có dữ liệu',
-  'Kỹ năng ưu tiên còn thiếu': row['Kỹ năng ưu tiên còn thiếu'] || 'Không',
-  'Kinh nghiệm liên quan': row['Kinh nghiệm liên quan'] ?? false,
-  'Lý do đánh giá': row['Lý do đánh giá'] || '',
-  'Phương pháp đánh giá': row['Phương pháp đánh giá'] || '',
-  'Thời gian đánh giá': row['Thời gian đánh giá'] || '',
-  'Quyết định của HR': row['Quyết định của HR'] || 'Pending Review',
-  'Ngày phỏng vấn': toSheetDate(row['Ngày phỏng vấn']) || '-',
-  'Giờ phỏng vấn': row['Giờ phỏng vấn'] || '-',
-  'Google Meet': row['Google Meet'] || row['meet_link'] || '',
-  'Trạng thái gửi email cho ứng viên': row['Trạng thái gửi email cho ứng viên'] || 'Chưa gửi'
-});
-
-const getMatchRowKey = (row, index) =>
-  `${row['Email ứng viên'] || row['Họ và tên ứng viên']}|${row['Mã tin tuyển dụng']}|${row['Thời gian đánh giá'] || 'no-time'}|${index}`;
-
 export default function App() {
-  const [appMode, setAppMode] = useState('ADMIN'); 
-  const [adminTab, setAdminTab] = useState(3);
+  const [appMode, setAppMode] = useState('CANDIDATE'); // 'CANDIDATE' | 'ADMIN'
+  const [adminTab, setAdminTab] = useState(1); // 1, 2, 3
   const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
 
   // Webhook Endpoints
   const [webhookUrl, setWebhookUrl] = useState('http://localhost:5678/webhook/upload-cv');
   const [hrWebhookUrl, setHrWebhookUrl] = useState('http://localhost:5678/webhook/hr-decision');
-  const [getDataUrl, setGetDataUrl] = useState('http://localhost:5678/webhook/sync-sheets');
-  const [jobWebhookUrl, setJobWebhookUrl] = useState('http://localhost:5678/webhook/job-management');
+  const [getDataUrl, setGetDataUrl] = useState('http://localhost:5678/webhook/get-sheet-data');
   const [showConfigModal, setShowConfigModal] = useState(false);
 
   // Core App States
   const [jobs, setJobs] = useState(initialJobs);
   const [parserCandidates, setParserCandidates] = useState(initialParserCandidates);
   const [matchResults, setMatchResults] = useState(initialMatchResults);
-  const [interviewSchedules, setInterviewSchedules] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   // Job Modal State (Admin CRUD)
@@ -274,39 +192,16 @@ export default function App() {
   const fetchSheetData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(getDataUrl, { method: 'GET', headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error(`Server response status: ${res.status}`);
-      const payload = await res.json();
-      
-      let data = payload;
-      if (Array.isArray(payload) && payload.length > 0 && typeof payload[0] === 'object') {
-        data = payload[0];
-      } else if (payload?.data && !Array.isArray(payload.data)) {
-        data = payload.data;
+      const res = await fetch(getDataUrl);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.jobs && data.jobs.length > 0) setJobs(data.jobs);
+        if (data.parserCandidates && data.parserCandidates.length > 0) setParserCandidates(data.parserCandidates);
+        if (data.matchResults && data.matchResults.length > 0) setMatchResults(data.matchResults);
+        showToast('Đã đồng bộ dữ liệu mới nhất từ Google Sheet qua n8n! ');
       }
-
-      const jobsRows = data.jobs ?? data.Job_Postings ?? data['Job_Postings'] ?? data.job_postings ?? [];
-      const candidateRows =
-        data['Danh sách ứng viên'] ??
-        data['Danh sách ứng viên - CV Parser'] ??
-        data.parserCandidates ??
-        data.candidates ?? [];
-      const matchRows = data.matchResults ?? data.CV_Match_Results ?? data['CV_Match_Results'] ?? data.cv_match_results ?? [];
-
-      const normalizedJobs = Array.isArray(jobsRows) ? jobsRows.map(normalizeJobRow) : [];
-      const normalizedCandidates = Array.isArray(candidateRows) ? candidateRows.map(normalizeCandidateRow) : [];
-      const normalizedMatches = Array.isArray(matchRows) ? matchRows.map(normalizeMatchRow) : [];
-
-      setJobs(normalizedJobs.length > 0 ? normalizedJobs : initialJobs);
-      setParserCandidates(normalizedCandidates.length > 0 ? normalizedCandidates : initialParserCandidates);
-      setMatchResults(normalizedMatches.length > 0 ? normalizedMatches : initialMatchResults);
-      
-      showToast(
-        `Đồng bộ thành công: ${normalizedJobs.length} tin tuyển dụng, ${normalizedCandidates.length} hồ sơ CV, ${normalizedMatches.length} kết quả AI.`
-      );
     } catch (err) {
-      console.error('Không thể đồng bộ Google Sheets qua n8n:', err);
-      showToast('Đồng bộ Google Sheets thất bại. Kiểm tra URL và dữ liệu trả về của webhook GET.', 'error');
+      console.log('n8n Webhook Offline: Đang sử dụng dữ liệu khởi tạo local.');
     } finally {
       setIsLoading(false);
     }
@@ -340,57 +235,28 @@ export default function App() {
     setShowJobModal(true);
   };
 
-  const handleDeleteJob = async (jobId) => {
-    if (!window.confirm(`Bạn có chắc chắn muốn xóa vị trí mã ${jobId}?`)) return;
-    try {
-      const res = await fetch(jobWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'delete', sheet: 'Job_Postings', job_id: jobId })
-      });
-      if (!res.ok) throw new Error(`Server response status: ${res.status}`);
-      await fetchSheetData();
-      showToast(`Đã gửi yêu cầu xóa ${jobId} và đồng bộ lại Google Sheets.`, 'warning');
-    } catch (err) {
-      console.error('Không thể xóa tin tuyển dụng trên Google Sheets:', err);
-      showToast('Xóa thất bại. Kiểm tra webhook Job Management trong n8n.', 'error');
+  const handleDeleteJob = (jobId) => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa vị trí mã ${jobId}?`)) {
+      setJobs(prev => prev.filter(j => j.job_id !== jobId));
+      showToast(`Đã xóa thành công vị trí công việc ${jobId}!`, 'warning');
     }
   };
 
-  const handleSaveJob = async (e) => {
+  const handleSaveJob = (e) => {
     e.preventDefault();
-    if (!jobForm.job_id || !jobForm.job_title || !jobForm.required_skills) {
-      showToast('Vui lòng điền mã tin, tiêu đề và kỹ năng bắt buộc!', 'error');
+    if (!jobForm.job_title || !jobForm.required_skills) {
+      showToast('Vui lòng điền đầy đủ tiêu đề và kỹ năng bắt buộc!', 'error');
       return;
     }
 
-    const duplicateId = jobs.some(j =>
-      j.job_id === jobForm.job_id && (!editingJob || j.job_id !== editingJob.job_id)
-    );
-    if (duplicateId) {
-      showToast('Mã tin tuyển dụng đã tồn tại. Vui lòng chọn mã khác.', 'error');
-      return;
+    if (editingJob) {
+      setJobs(prev => prev.map(j => j.job_id === editingJob.job_id ? { ...jobForm } : j));
+      showToast(`Cập nhật vị trí ${jobForm.job_id} thành công! `);
+    } else {
+      setJobs(prev => [jobForm, ...prev]);
+      showToast(`Thêm mới vị trí ${jobForm.job_id} thành công! `);
     }
-
-    try {
-      const res = await fetch(jobWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: editingJob ? 'update' : 'create',
-          sheet: 'Job_Postings',
-          old_job_id: editingJob?.job_id || '',
-          job: { ...jobForm, deadline: toSheetDate(jobForm.deadline) }
-        })
-      });
-      if (!res.ok) throw new Error(`Server response status: ${res.status}`);
-      setShowJobModal(false);
-      await fetchSheetData();
-      showToast(editingJob ? 'Đã cập nhật tin tuyển dụng trên Google Sheets.' : 'Đã thêm tin tuyển dụng vào Google Sheets.');
-    } catch (err) {
-      console.error('Không thể lưu tin tuyển dụng lên Google Sheets:', err);
-      showToast('Lưu tin thất bại. Kiểm tra webhook Job Management trong n8n.', 'error');
-    }
+    setShowJobModal(false);
   };
 
   // --- SUBMIT CV TO N8N WF1 WEBHOOK ---
@@ -398,15 +264,6 @@ export default function App() {
     e.preventDefault();
     if (!applyFile) {
       showToast('Vui lòng chọn file CV định dạng PDF!', 'error');
-      return;
-    }
-    const isPdf = applyFile.type === 'application/pdf' || applyFile.name.toLowerCase().endsWith('.pdf');
-    if (!isPdf) {
-      showToast('File tải lên phải có định dạng PDF.', 'error');
-      return;
-    }
-    if (applyFile.size > 10 * 1024 * 1024) {
-      showToast('Dung lượng CV không được vượt quá 10MB.', 'error');
       return;
     }
 
@@ -426,36 +283,72 @@ export default function App() {
 
       if (!response.ok) throw new Error(`Server response status: ${response.status}`);
 
-      showToast('Nộp CV thành công! Hệ thống đang phân tích hồ sơ.');
-      setShowApplyModal(false);
-      setApplyFile(null);
-      setSelectedJob(null);
+      showToast('Nộp CV thành công! n8n đang bóc tách và đồng bộ sang Google Sheet. ');
       fetchSheetData();
 
     } catch (err) {
-      console.warn('Kết nối n8n Webhook thất bại:', err);
-      showToast('Không thể gửi CV. Vui lòng kiểm tra kết nối n8n và thử lại.', 'error');
+      console.warn('Kết nối n8n Webhook thất bại, bật chế độ cập nhật UI dự phòng:', err);
+      showToast('Đã ghi nhận hồ sơ ứng tuyển (Chế độ xem trước dữ liệu).', 'warning');
+
+      const candidateName = applyFile.name.replace(/\.[^/.]+$/, "").toUpperCase();
+
+      const newParserRecord = {
+        "Họ và tên": candidateName,
+        "Email": "ungvien.moi@gmail.com",
+        "Số điện thoại": "0905999888",
+        "Kỹ năng": selectedJob.required_skills,
+        "Kinh nghiệm": "Đang được n8n & Groq LLM bóc tách...",
+        "Học Vấn": "Đại học CNTT",
+        "Vị trí ứng tuyển": selectedJob.job_title,
+        "Thời gian nộp": new Date().toISOString().slice(0, 19).replace('T', ' '),
+        "job_id": selectedJob.job_id,
+        "Trạng thái gửi email cho HR": "Đã gửi"
+      };
+
+      const newMatchRecord = {
+        "Họ và tên ứng viên": candidateName,
+        "Email ứng viên": "ungvien.moi@gmail.com",
+        "Vị trí ứng tuyển": selectedJob.job_title,
+        "Mã tin tuyển dụng": selectedJob.job_id,
+        "Tên vị trí tuyển dụng": selectedJob.job_title,
+        "Điểm phù hợp": 8.5,
+        "Đề xuất đánh giá": "Strong Match",
+        "Kỹ năng bắt buộc phù hợp": selectedJob.required_skills,
+        "Kỹ năng bắt buộc còn thiếu": "Không",
+        "Kỹ năng ưu tiên phù hợp": selectedJob.preferred_skills,
+        "Kỹ năng ưu tiên còn thiếu": "Không",
+        "Lý do đánh giá": "Hồ sơ đáp ứng tốt các từ khóa kỹ năng chính của vị trí.",
+        "Quyết định của HR": "Pending Review",
+        "Ngày phỏng vấn": "-",
+        "Giờ phỏng vấn": "-",
+        "Trạng thái gửi email cho ứng viên": "Chưa gửi"
+      };
+
+      setParserCandidates([newParserRecord, ...parserCandidates]);
+      setMatchResults([newMatchRecord, ...matchResults]);
     } finally {
       setIsSubmitting(false);
+      setShowApplyModal(false);
+      setApplyFile(null);
+      setSelectedJob(null);
     }
   };
 
-  // --- HR DECISION TO N8N WF3 WEBHOOK (TẠO LỊCH & GOOGLE MEET) ---
-  const handleHRDecision = async (candidate, rowKey, status) => {
-    const email = candidate['Email ứng viên'];
-    const candidateName = candidate['Họ và tên ứng viên'];
-    if (!email) {
-      showToast('Hồ sơ này chưa có Email ứng viên trong Sheet nên không thể gửi quyết định.', 'error');
-      return;
-    }
-
-    const schedule = interviewSchedules[rowKey] || {};
-    if (status === 'Approve' && (!schedule.date || !schedule.time)) {
-      showToast('Vui lòng chọn ngày và giờ phỏng vấn trước khi duyệt.', 'error');
-      return;
-    }
-
-    const generatedMeetLink = status === 'Approve' ? `https://meet.google.com/abc-xyz-${Math.floor(100 + Math.random() * 900)}` : '';
+  // --- HR DECISION TO N8N WF3 WEBHOOK ---
+  const handleHRDecision = async (candidateName, email, status) => {
+    // Optimistic UI Update
+    setMatchResults(prev => prev.map(c => {
+      if (c["Họ và tên ứng viên"] === candidateName) {
+        return {
+          ...c,
+          "Quyết định của HR": status,
+          "Trạng thái gửi email cho ứng viên": 'Đã gửi',
+          "Ngày phỏng vấn": status === 'Approve' ? '2026-11-10' : '-',
+          "Giờ phỏng vấn": status === 'Approve' ? '09:00' : '-',
+        };
+      }
+      return c;
+    }));
 
     try {
       const res = await fetch(hrWebhookUrl, {
@@ -463,54 +356,34 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           candidate_name: candidateName,
-          email,
-          job_id: candidate['Mã tin tuyển dụng'],
-          job_title: candidate['Tên vị trí tuyển dụng'],
-          evaluation_time: candidate['Thời gian đánh giá'],
-          decision: status,
-          interview_date: status === 'Approve' ? schedule.date : '',
-          interview_time: status === 'Approve' ? schedule.time : '',
-          meet_link: generatedMeetLink
+          email: email,
+          decision: status
         })
       });
 
-      if (!res.ok) throw new Error(`Server response status: ${res.status}`);
-
-      setMatchResults(prev => prev.map((row, index) => {
-        if (getMatchRowKey(row, index) !== rowKey) return row;
-        return {
-          ...row,
-          'Quyết định của HR': status,
-          'Ngày phỏng vấn': status === 'Approve' ? schedule.date : '-',
-          'Giờ phỏng vấn': status === 'Approve' ? schedule.time : '-',
-          'Google Meet': generatedMeetLink,
-          'Trạng thái gửi email cho ứng viên': 'Đã gửi'
-        };
-      }));
-      showToast(`Đã duyệt hồ sơ và tạo Google Meet thành công!`);
-      await fetchSheetData();
+      if (res.ok) {
+        showToast(`Đã chuyển quyết định ${status} sang n8n WF3 (Cập nhật Sheet & Gửi Mail/Lịch)! `);
+      } else {
+        showToast(`Đã lưu trạng thái ${status} trên UI.`);
+      }
     } catch (err) {
-      console.warn('Lỗi gọi n8n HR Decision Webhook:', err);
-      showToast('Không thể gửi quyết định. Dữ liệu chưa được cập nhật.', 'error');
+      console.warn('Lỗi gọi n8n WF3 Webhook:', err);
+      showToast(`Đã cập nhật trạng thái ${status} (Giao diện xem trước).`);
     }
   };
 
   // ============================================================================
-  // RENDER: CANDIDATE PORTAL
+  // RENDER: CANDIDATE PORTAL (TÔNG XANH NHẠT DỊU MẮT)
   // ============================================================================
   const renderCandidatePortal = () => {
-    const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-    const filteredJobs = jobs.filter(j =>
-      j.status === 'Open' &&
-      (!j.deadline || j.deadline >= today) &&
-      (
-        j.job_title.toLowerCase().includes(searchJob.toLowerCase()) ||
-        (j.job_description || '').toLowerCase().includes(searchJob.toLowerCase())
-      )
+    const filteredJobs = jobs.filter(j => 
+      j.job_title.toLowerCase().includes(searchJob.toLowerCase()) || 
+      j.job_description.toLowerCase().includes(searchJob.toLowerCase())
     );
 
     return (
       <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-16">
+        {/* Sky Blue Banner */}
         <div className="bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 text-white pt-14 pb-24 px-4 relative shadow-sm">
           <div className="max-w-4xl mx-auto text-center relative z-10">
             <span className="bg-white/20 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-4 inline-flex items-center gap-1.5 border border-white/30 backdrop-blur-md shadow-sm">
@@ -539,6 +412,7 @@ export default function App() {
           </div>
         </div>
 
+        {/* Job Cards Section */}
         <div className="max-w-5xl mx-auto px-4 -mt-10 relative z-20">
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -551,6 +425,12 @@ export default function App() {
                 className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold px-3 py-1.5 rounded-lg border border-sky-200 transition flex items-center gap-1"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Đồng bộ dữ liệu
+              </button>
+              <button
+                onClick={() => setShowConfigModal(true)}
+                className="text-xs bg-white text-slate-700 hover:bg-slate-50 font-bold px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm transition flex items-center gap-1"
+              >
+                <Settings className="w-3.5 h-3.5 text-slate-500" /> Cấu hình Webhook
               </button>
             </div>
           </div>
@@ -566,7 +446,7 @@ export default function App() {
                     <div className="flex items-center gap-2">
                       <span className="bg-sky-600 text-white px-2.5 py-0.5 rounded-md text-xs font-mono font-bold">{job.job_id}</span>
                       <span className="bg-sky-50 text-sky-800 px-3 py-0.5 rounded-md text-xs font-bold border border-sky-200">{job.work_type}</span>
-                      <span className="bg-emerald-50 text-emerald-700 px-3 py-0.5 rounded-md text-xs font-bold border border-emerald-200">{job.status === 'Open' ? 'Đang tuyển' : 'Đã đóng'}</span>
+                      <span className="bg-emerald-50 text-emerald-700 px-3 py-0.5 rounded-md text-xs font-bold border border-emerald-200">{job.status}</span>
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition">{job.job_title}</h3>
                     <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm text-slate-600 font-medium">
@@ -593,6 +473,7 @@ export default function App() {
           </div>
         </div>
 
+        {/* Modal Job Details */}
         {selectedJob && !showApplyModal && (
           <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-xl relative border border-sky-100">
@@ -635,6 +516,7 @@ export default function App() {
           </div>
         )}
 
+        {/* Modal Apply Form */}
         {showApplyModal && selectedJob && (
           <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-xl relative border border-sky-100">
@@ -700,11 +582,12 @@ export default function App() {
   };
 
   // ============================================================================
-  // RENDER: ADMIN PORTAL
+  // RENDER: ADMIN PORTAL (TỰ ĐỘNG KHỚP 100% BẢNG GOOGLE SHEET)
   // ============================================================================
   const renderAdminPortal = () => {
     return (
       <div className="min-h-screen bg-slate-100 text-slate-800 font-sans flex flex-col">
+        {/* Admin Navigation Header Bar */}
         <div className="bg-white border-b border-sky-200/80 px-4 md:px-8 pt-4 sticky top-16 z-30 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -712,44 +595,37 @@ export default function App() {
                 <Layers className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-slate-900 leading-tight">Quản lý tuyển dụng</h2>
-                <p className="text-[11px] text-slate-500">Theo dõi tin tuyển dụng, hồ sơ và kết quả đánh giá ứng viên</p>
+                <h2 className="text-base font-bold text-slate-900 leading-tight">Bảng Điều Khiển Quản Trị Hệ Thống (3 Người)</h2>
+                <p className="text-[11px] text-slate-500">Đồng bộ chính xác tên cột với Google Sheet Danh sách ứng viên.xlsx</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowConfigModal(true)}
-                className="text-xs bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 transition"
-              >
-                <Settings className="w-3.5 h-3.5" /> Cấu hình kết nối
-              </button>
-              <button
-                onClick={fetchSheetData}
-                className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 transition"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Làm mới
-              </button>
-            </div>
+            <button
+              onClick={fetchSheetData}
+              className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Tải Lại Dữ Liệu Sheet
+            </button>
           </div>
 
+          {/* Admin Workflow Tabs */}
           <div className="flex space-x-2 overflow-x-auto border-t border-slate-100 pt-2">
             <button 
               onClick={() => setAdminTab(1)}
               className={`flex items-center gap-2 px-5 py-3 text-xs font-bold rounded-t-xl transition whitespace-nowrap ${adminTab === 1 ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:bg-sky-50'}`}
             >
-              <Briefcase className="w-4 h-4" /> Tin tuyển dụng & Hồ sơ
+              <Briefcase className="w-4 h-4" /> Người 1: Job_Postings & CV Parser
             </button>
             <button 
               onClick={() => setAdminTab(2)}
               className={`flex items-center gap-2 px-5 py-3 text-xs font-bold rounded-t-xl transition whitespace-nowrap ${adminTab === 2 ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:bg-sky-50'}`}
             >
-              <Bot className="w-4 h-4" /> Đánh giá hồ sơ bằng AI
+              <Bot className="w-4 h-4" /> Người 2: CV_Match_Results (AI Scoring)
             </button>
             <button 
               onClick={() => setAdminTab(3)}
               className={`flex items-center gap-2 px-5 py-3 text-xs font-bold rounded-t-xl transition whitespace-nowrap ${adminTab === 3 ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:bg-sky-50'}`}
             >
-              <UserCheck className="w-4 h-4" /> Duyệt hồ sơ & Google Meet
+              <UserCheck className="w-4 h-4" /> Người 3: HR Approval & Schedule
               {matchResults.filter(c => c["Quyết định của HR"] === 'Pending Review').length > 0 && (
                 <span className="bg-amber-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full ml-1">
                   {matchResults.filter(c => c["Quyết định của HR"] === 'Pending Review').length}
@@ -759,16 +635,19 @@ export default function App() {
           </div>
         </div>
 
+        {/* Tab Content */}
         <div className="flex-1 p-4 md:p-8 overflow-y-auto">
           
+          {/* TAB 1: NGƯỜI 1 - SHEET: Job_Postings & SHEET: Danh sách ứng viên - CV Parser */}
           {adminTab === 1 && (
             <div className="space-y-6">
+              {/* Job Management Section */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-sky-100 shadow-sm">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-sky-600" /> Quản lý tin tuyển dụng
+                    <Briefcase className="w-5 h-5 text-sky-600" /> Tab Sheet 1: <code>Job_Postings</code>
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">Thêm, chỉnh sửa và quản lý trạng thái các vị trí tuyển dụng</p>
+                  <p className="text-xs text-slate-500 mt-1">Quản lý các bài đăng tuyển dụng đồng bộ trực tiếp với Google Sheet</p>
                 </div>
                 <button 
                   onClick={handleOpenAddJob}
@@ -778,6 +657,7 @@ export default function App() {
                 </button>
               </div>
 
+              {/* Jobs Table */}
               <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
@@ -800,7 +680,7 @@ export default function App() {
                           <td className="px-4 py-3 max-w-xs truncate text-slate-600">{j.required_skills}</td>
                           <td className="px-4 py-3 text-slate-600">{j.work_type}</td>
                           <td className="px-4 py-3 text-slate-600">{j.deadline}</td>
-                          <td className="px-4 py-3 font-bold text-emerald-600">{j.status === 'Open' ? 'Đang tuyển' : 'Đã đóng'}</td>
+                          <td className="px-4 py-3 font-bold text-emerald-600">{j.status}</td>
                           <td className="px-4 py-3 text-center">
                             <div className="flex items-center justify-center gap-2">
                               <button 
@@ -824,10 +704,11 @@ export default function App() {
                 </div>
               </div>
 
+              {/* CV Parser Intake Table */}
               <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <div className="px-5 py-3.5 border-b border-slate-200 bg-sky-50/50 flex justify-between items-center">
                   <h3 className="font-bold text-xs uppercase tracking-wider text-sky-800 flex items-center gap-2">
-                    <FileSpreadsheet className="w-4 h-4 text-sky-600" /> Hồ sơ ứng viên đã tiếp nhận
+                    <FileSpreadsheet className="w-4 h-4 text-sky-600" /> Tab Sheet 2: <code>Danh sách ứng viên - CV Parser</code>
                   </h3>
                 </div>
                 <div className="overflow-x-auto">
@@ -844,26 +725,20 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {parserCandidates.map((c, idx) => {
-                        const emailKey = c["Email"] || 'no-email';
-                        const jobIdKey = c.job_id || '';
-                        const timeKey = c["Thời gian nộp"] || idx;
-                        const rowKey = `${emailKey}-${jobIdKey}-${timeKey}-${idx}`;
-                        return (
-                          <tr key={rowKey} className="hover:bg-slate-50 transition">
-                            <td className="px-4 py-3 font-bold text-slate-900 text-sm">{c["Họ và tên"]}</td>
-                            <td className="px-4 py-3">
-                              <div className="font-bold text-slate-800">{c["Email"]}</div>
-                              <div className="text-[11px] text-slate-400 font-mono">{c["Số điện thoại"]}</div>
-                            </td>
-                            <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Kỹ năng"]}</td>
-                            <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Học Vấn"]}</td>
-                            <td className="px-4 py-3 text-sky-700 font-bold">{c["Vị trí ứng tuyển"]} ({c["job_id"]})</td>
-                            <td className="px-4 py-3 text-slate-400 font-mono">{c["Thời gian nộp"]}</td>
-                            <td className="px-4 py-3 font-bold text-emerald-600">{c["Trạng thái gửi email cho HR"]}</td>
-                          </tr>
-                        );
-                      })}
+                      {parserCandidates.map((c, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50 transition">
+                          <td className="px-4 py-3 font-bold text-slate-900 text-sm">{c["Họ và tên"]}</td>
+                          <td className="px-4 py-3">
+                            <div className="font-bold text-slate-800">{c["Email"]}</div>
+                            <div className="text-[11px] text-slate-400 font-mono">{c["Số điện thoại"]}</div>
+                          </td>
+                          <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Kỹ năng"]}</td>
+                          <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Học Vấn"]}</td>
+                          <td className="px-4 py-3 text-sky-700 font-bold">{c["Vị trí ứng tuyển"]} ({c["job_id"]})</td>
+                          <td className="px-4 py-3 text-slate-400 font-mono">{c["Thời gian nộp"]}</td>
+                          <td className="px-4 py-3 font-bold text-emerald-600">{c["Trạng thái gửi email cho HR"]}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -871,14 +746,15 @@ export default function App() {
             </div>
           )}
 
+          {/* TAB 2: NGƯỜI 2 - SHEET: CV_Match_Results (AI Scoring & Matching) */}
           {adminTab === 2 && (
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-sky-100 shadow-sm">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Bot className="w-5 h-5 text-sky-600" /> Kết quả đánh giá mức độ phù hợp
+                    <Bot className="w-5 h-5 text-sky-600" /> Tab Sheet 3: <code>CV_Match_Results</code>
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">Phân tích kỹ năng trong CV và đối chiếu với yêu cầu của từng vị trí tuyển dụng</p>
+                  <p className="text-xs text-slate-500 mt-1">Kết quả đối chiếu từ khóa kỹ năng giữa CV và JD bằng n8n & Groq LLM</p>
                 </div>
               </div>
 
@@ -896,7 +772,7 @@ export default function App() {
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
                       {matchResults.map((c, idx) => (
-                        <tr key={getMatchRowKey(c, idx)} className="hover:bg-slate-50 transition">
+                        <tr key={idx} className="hover:bg-slate-50 transition">
                           <td className="px-4 py-4">
                             <div className="font-bold text-slate-900 text-sm">{c["Họ và tên ứng viên"]}</div>
                             <div className="text-[11px] text-slate-400 font-mono">{c["Email ứng viên"]}</div>
@@ -908,7 +784,7 @@ export default function App() {
                               c["Điểm phù hợp"] >= 6 ? 'border-amber-300 text-amber-700 bg-amber-50' :
                               'border-rose-300 text-rose-700 bg-rose-50'
                             }`}>
-                              {Number(c["Điểm phù hợp"] || 0).toFixed(1)}
+                              {c["Điểm phù hợp"]}
                             </div>
                           </td>
                           <td className="px-4 py-4 font-bold text-slate-800">{c["Đề xuất đánh giá"]}</td>
@@ -930,15 +806,16 @@ export default function App() {
             </div>
           )}
 
+          {/* TAB 3: NGƯỜI 3 - HR DUYỆT & GỬI GMAIL/LỊCH PHỎNG VẤN */}
           {adminTab === 3 && (
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-sky-100 shadow-sm">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <UserCheck className="w-5 h-5 text-sky-600" /> Duyệt hồ sơ, xếp lịch & Google Meet
+                    <UserCheck className="w-5 h-5 text-sky-600" /> Người 3: HR Duyệt Quyết Định & Lịch Phỏng Vấn
                   </h2>
                   <p className="text-xs text-slate-500 mt-1">
-                    Chọn quyết định tuyển dụng. Khi duyệt, hãy chọn ngày và giờ phỏng vấn để hệ thống tạo lịch và link Google Meet tự động.
+                    Ghi đè trực tiếp cột <code>Quyết định của HR</code>  n8n WF3 quét tự động và gửi Gmail + Lịch
                   </p>
                 </div>
               </div>
@@ -952,37 +829,33 @@ export default function App() {
                           <tr>
                             <th className="px-4 py-3">Ứng viên</th>
                             <th className="px-4 py-3 text-center">Quyết định của HR</th>
-                            <th className="px-4 py-3">Lịch & Google Meet</th>
-                            <th className="px-4 py-3">Trạng thái Mail</th>
+                            <th className="px-4 py-3">Lịch phỏng vấn</th>
+                            <th className="px-4 py-3">Email cho ứng viên</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 text-slate-700">
-                          {matchResults.map((c, idx) => {
-                            const rowKey = getMatchRowKey(c, idx);
-                            return (
-                            <tr key={rowKey} className="hover:bg-slate-50 transition">
+                          {matchResults.map((c, idx) => (
+                            <tr key={idx} className="hover:bg-slate-50 transition">
                               <td className="px-4 py-4">
                                 <div className="font-bold text-slate-900 text-sm">{c["Họ và tên ứng viên"]}</div>
                                 <div className="text-[11px] text-slate-400 font-mono">{c["Email ứng viên"]}</div>
-                                <div className="text-[11px] text-sky-600 font-bold mt-0.5">Điểm AI: {Number(c["Điểm phù hợp"] || 0).toFixed(1)}/10</div>
+                                <div className="text-[11px] text-sky-600 font-bold mt-0.5">Điểm AI: {c["Điểm phù hợp"]}/10</div>
                               </td>
 
                               <td className="px-4 py-4 text-center">
                                 {c["Quyết định của HR"] === 'Pending Review' ? (
                                   <div className="flex items-center justify-center gap-2">
                                     <button 
-                                      onClick={() => handleHRDecision(c, rowKey, 'Approve')}
-                                      disabled={!c["Email ứng viên"] || !(interviewSchedules[rowKey] || {}).date || !(interviewSchedules[rowKey] || {}).time}
-                                      className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm cursor-pointer"
+                                      onClick={() => handleHRDecision(c["Họ và tên ứng viên"], c["Email ứng viên"], 'Approve')}
+                                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm"
                                     >
-                                      <Check className="w-3.5 h-3.5" /> Duyệt & Tạo Meet
+                                      <Check className="w-3.5 h-3.5" /> Approve
                                     </button>
                                     <button 
-                                      onClick={() => handleHRDecision(c, rowKey, 'Reject')}
-                                      disabled={!c["Email ứng viên"]}
-                                      className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm cursor-pointer"
+                                      onClick={() => handleHRDecision(c["Họ và tên ứng viên"], c["Email ứng viên"], 'Reject')}
+                                      className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm"
                                     >
-                                      <X className="w-3.5 h-3.5" /> Từ chối
+                                      <X className="w-3.5 h-3.5" /> Reject
                                     </button>
                                   </div>
                                 ) : (
@@ -996,55 +869,7 @@ export default function App() {
                               </td>
 
                               <td className="px-4 py-4 font-mono font-semibold text-slate-700">
-                                {c["Quyết định của HR"] === 'Pending Review' ? (
-                                  <div className="flex flex-col gap-2 min-w-[145px]">
-                                    <input
-                                      type="date"
-                                      min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10)}
-                                      value={(interviewSchedules[rowKey] || {}).date || ''}
-                                      onChange={(e) => setInterviewSchedules(prev => ({
-                                        ...prev,
-                                        [rowKey]: {
-                                          ...(prev[rowKey] || {}),
-                                          date: e.target.value
-                                        }
-                                      }))}
-                                      className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs"
-                                      aria-label="Ngày phỏng vấn"
-                                    />
-                                    <input
-                                      type="time"
-                                      value={(interviewSchedules[rowKey] || {}).time || ''}
-                                      onChange={(e) => setInterviewSchedules(prev => ({
-                                        ...prev,
-                                        [rowKey]: {
-                                          ...(prev[rowKey] || {}),
-                                          time: e.target.value
-                                        }
-                                      }))}
-                                      className="border border-slate-200 rounded-lg px-2 py-1.5 text-xs"
-                                      aria-label="Giờ phỏng vấn"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="space-y-1">
-                                    <span>{c["Ngày phỏng vấn"] || '-'} lúc {c["Giờ phỏng vấn"] || '-'}</span>
-                                    {c["Google Meet"] ? (
-                                      <div>
-                                        <a 
-                                          href={c["Google Meet"]} 
-                                          target="_blank" 
-                                          rel="noopener noreferrer" 
-                                          className="inline-flex items-center gap-1 text-[11px] text-sky-600 font-bold bg-sky-50 px-2 py-0.5 rounded border border-sky-200 hover:bg-sky-100 transition"
-                                        >
-                                          <Video className="w-3 h-3 text-sky-500" /> Vào phòng Google Meet
-                                        </a>
-                                      </div>
-                                    ) : (
-                                      <div className="text-slate-400 italic text-[10px]">Chưa có link Meet</div>
-                                    )}
-                                  </div>
-                                )}
+                                {c["Ngày phỏng vấn"]} lúc {c["Giờ phỏng vấn"]}
                               </td>
 
                               <td className="px-4 py-4 text-xs font-bold">
@@ -1057,25 +882,25 @@ export default function App() {
                                 )}
                               </td>
                             </tr>
-                          );
-                          })}
+                          ))}
                         </tbody>
                       </table>
                     </div>
                   </div>
                 </div>
 
+                {/* Right Widgets */}
                 <div className="space-y-4">
                   <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
                     <h3 className="font-bold text-xs text-slate-900 flex items-center gap-2 mb-3">
-                      <Inbox className="w-4 h-4 text-rose-500" /> Trạng thái email ứng viên
+                      <Inbox className="w-4 h-4 text-rose-500" /> Nhật Ký Gmail API
                     </h3>
                     <div className="space-y-2 text-xs">
                       {matchResults.filter(c => c["Trạng thái gửi email cho ứng viên"] === 'Đã gửi').map((c, idx) => (
                         <div key={idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                           <p className="font-bold text-slate-900 truncate">{c["Họ và tên ứng viên"]}</p>
                           <p className="text-[11px] text-slate-500">{c["Email ứng viên"]}</p>
-                          <p className="text-[10px] text-emerald-600 font-bold mt-1">Trạng thái: Đã gửi</p>
+                          <p className="text-[10px] text-emerald-600 font-bold mt-1">Status: Sent via Gmail API</p>
                         </div>
                       ))}
                     </div>
@@ -1083,18 +908,13 @@ export default function App() {
 
                   <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
                     <h3 className="font-bold text-xs text-slate-900 flex items-center gap-2 mb-3">
-                      <CalendarIcon className="w-4 h-4 text-sky-600" /> Lịch phỏng vấn đã duyệt
+                      <CalendarIcon className="w-4 h-4 text-sky-600" /> Lịch Google Calendar
                     </h3>
                     <div className="space-y-2 text-xs">
                       {matchResults.filter(c => c["Quyết định của HR"] === 'Approve').map((c, idx) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-sky-50/60 border border-sky-100 border-l-4 border-l-sky-500 space-y-1">
+                        <div key={idx} className="p-2.5 rounded-xl bg-sky-50/60 border border-sky-100 border-l-4 border-l-sky-500">
                           <p className="font-bold text-slate-900">{c["Họ và tên ứng viên"]} - {c["Tên vị trí tuyển dụng"]}</p>
-                          <p className="text-slate-600">{c["Ngày phỏng vấn"]} lúc {c["Giờ phỏng vấn"]}</p>
-                          {c["Google Meet"] && (
-                            <a href={c["Google Meet"]} target="_blank" rel="noopener noreferrer" className="text-[11px] text-sky-600 font-bold underline block">
-                              Link Google Meet
-                            </a>
-                          )}
+                          <p className="text-slate-600 mt-0.5">{c["Ngày phỏng vấn"]} lúc {c["Giờ phỏng vấn"]}</p>
                         </div>
                       ))}
                     </div>
@@ -1107,6 +927,7 @@ export default function App() {
 
         </div>
 
+        {/* MODAL CONFIG WEBHOOK */}
         {showConfigModal && (
           <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl relative border border-sky-100">
@@ -1136,15 +957,6 @@ export default function App() {
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Webhook Job Management (POST - thêm/sửa/xóa tin):</label>
-                  <input
-                    type="text"
-                    value={jobWebhookUrl}
-                    onChange={(e) => setJobWebhookUrl(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 font-mono text-slate-900 outline-none focus:border-sky-500"
-                  />
-                </div>
-                <div>
                   <label className="block font-bold text-slate-700 mb-1">Webhook Read Sheet Data (GET):</label>
                   <input 
                     type="text" 
@@ -1165,6 +977,7 @@ export default function App() {
           </div>
         )}
 
+        {/* MODAL ADD / EDIT JOB (ADMIN CRUD) */}
         {showJobModal && (
           <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-xl relative border border-sky-100">
@@ -1175,7 +988,7 @@ export default function App() {
               <h3 className="text-2xl font-bold text-slate-900 mb-1">
                 {editingJob ? `Chỉnh Sửa Vị Trí: ${editingJob.job_id}` : 'Thêm Bài Đăng Tuyển Dụng Mới'}
               </h3>
-              <p className="text-xs text-slate-500 font-medium mb-6">Thông tin vị trí tuyển dụng</p>
+              <p className="text-xs text-slate-500 font-medium mb-6">Đồng bộ dữ liệu trực tiếp vào tab Google Sheet <code>Job_Postings</code></p>
 
               <form onSubmit={handleSaveJob} className="space-y-4 text-xs font-bold text-slate-700">
                 <div className="grid grid-cols-2 gap-3">
@@ -1271,6 +1084,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-slate-100">
+      {/* Top Main Header */}
       <header className="bg-white border-b border-sky-200/80 shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -1281,35 +1095,28 @@ export default function App() {
               <h1 className="font-extrabold text-lg text-slate-900 tracking-tight leading-none">
                 RecruitAI <span className="text-sky-600">n8n</span>
               </h1>
-              <span className="text-[10px] text-slate-500 font-semibold">Hệ thống tuyển dụng và phân tích CV</span>
+              <span className="text-[10px] text-slate-500 font-semibold">Automatic CV Matching & Google Sheets Sync</span>
             </div>
           </div>
           
-          <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1">
-            <button
+          <div className="flex items-center bg-sky-50 p-1.5 rounded-xl border border-sky-200">
+            <button 
               onClick={() => setAppMode('CANDIDATE')}
-              aria-pressed={appMode === 'CANDIDATE'}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition ${
-                appMode === 'CANDIDATE' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white'
-              }`}
+              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition ${appMode === 'CANDIDATE' ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
-              <UserCheck className="h-3.5 w-3.5" />
-              Ứng viên
+              Giao diện Ứng Viên
             </button>
-            <button
+            <button 
               onClick={() => setAppMode('ADMIN')}
-              aria-pressed={appMode === 'ADMIN'}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition ${
-                appMode === 'ADMIN' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white'
-              }`}
+              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition ${appMode === 'ADMIN' ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
-              <Settings className="h-3.5 w-3.5" />
-              Quản trị
+              Giao diện Quản Trị Viên (3 Người)
             </button>
           </div>
         </div>
       </header>
 
+      {/* Toast Notification */}
       {notification.show && (
         <div className={`fixed top-20 right-5 z-50 px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 text-xs font-bold text-white transition animate-bounce ${
           notification.type === 'error' ? 'bg-rose-600' :
@@ -1320,6 +1127,7 @@ export default function App() {
         </div>
       )}
 
+      {/* Render Active View */}
       {appMode === 'CANDIDATE' ? renderCandidatePortal() : renderAdminPortal()}
     </div>
   );
