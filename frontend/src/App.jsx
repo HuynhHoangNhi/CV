@@ -6,11 +6,19 @@ import Toast from './components/Toast';
 import { Briefcase, LogOut, Mail, Lock, ArrowRight } from 'lucide-react';
 
 export default function App() {
+  // Cấu hình URL mặc định chuẩn Railway
+  const DEFAULT_RAILWAY_CONFIG = {
+    uploadCvUrl: 'https://n8n-production-2734a.up.railway.app/webhook/upload-cv',
+    jobManagementUrl: 'https://n8n-production-2734a.up.railway.app/webhook/manage-jobs',
+    hrDecisionUrl: 'https://n8n-production-2734a.up.railway.app/webhook/hr-decision',
+    getSheetDataUrl: 'https://n8n-production-2734a.up.railway.app/webhook/get-sheet-data'
+  };
+
   const [currentUser, setCurrentUser] = useState(() => {
-    const savedConfig = localStorage.getItem('n8nConfig_v2');
-    return saved ? JSON.parse(saved) : null;
+    const savedUser = localStorage.getItem('recruit_user');
+    return savedUser ? JSON.parse(savedUser) : null;
   });
-  
+
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
@@ -25,7 +33,31 @@ export default function App() {
     'uyenthu160706@gmail.com'
   ];
 
-  // Lưu trữ jobs vào localStorage để đồng bộ giữa Admin và Ứng viên
+  // Khởi tạo URL Webhook n8n (Ưu tiên Railway)
+  const [n8nConfig, setN8nConfig] = useState(() => {
+    const savedConfig = localStorage.getItem('n8nConfig');
+    if (savedConfig) {
+      try {
+        const parsed = JSON.parse(savedConfig);
+        // Nếu config cũ trong localStorage có chứa 'localhost', tự động ghi đè bằng Railway
+        if (parsed.uploadCvUrl && parsed.uploadCvUrl.includes('localhost')) {
+          localStorage.setItem('n8nConfig', JSON.stringify(DEFAULT_RAILWAY_CONFIG));
+          return DEFAULT_RAILWAY_CONFIG;
+        }
+        return parsed;
+      } catch (e) {
+        return DEFAULT_RAILWAY_CONFIG;
+      }
+    }
+    return DEFAULT_RAILWAY_CONFIG;
+  });
+
+  // Tự động lưu n8nConfig khi thay đổi
+  useEffect(() => {
+    localStorage.setItem('n8nConfig', JSON.stringify(n8nConfig));
+  }, [n8nConfig]);
+
+  // Lưu trữ jobs vào localStorage
   const [jobs, setJobs] = useState(() => {
     const savedJobs = localStorage.getItem('recruit_jobs');
     if (savedJobs) {
@@ -59,7 +91,6 @@ export default function App() {
     ];
   });
 
-  // Tự động lưu lại mỗi khi jobs thay đổi
   useEffect(() => {
     localStorage.setItem('recruit_jobs', JSON.stringify(jobs));
   }, [jobs]);
@@ -100,17 +131,6 @@ export default function App() {
       "Trạng thái gửi email cho ứng viên": "Chưa gửi"
     }
   ]);
-
-  const [n8nConfig, setN8nConfig] = useState(() => {
-  const savedConfig = localStorage.getItem('n8nConfig');
-
-  return savedConfig ? JSON.parse(savedConfig) : {
-    uploadCvUrl: 'https://n8n-production-2734a.up.railway.app/webhook/upload-cv',
-    jobManagementUrl: 'https://n8n-production-2734a.up.railway.app/webhook/manage-jobs',
-    hrDecisionUrl: 'https://n8n-production-2734a.up.railway.app/webhook/hr-decision',
-    getSheetDataUrl: 'https://n8n-production-2734a.up.railway.app/webhook/get-sheet-data'
-  };
-});
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -176,7 +196,6 @@ export default function App() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#174EA6]/90 to-slate-900 flex items-center justify-center p-4">
         <div className="bg-white/95 backdrop-blur-md rounded-3xl max-w-md w-full p-8 md:p-10 shadow-2xl border border-white/20 relative overflow-hidden">
-          
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
 
           <div className="text-center mb-8">
@@ -246,7 +265,7 @@ export default function App() {
       <header className="bg-white border-b border-slate-200 px-6 py-3.5 sticky top-0 z-40 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex items-center justify-between">
           <div className="text-xs font-bold text-[#174EA6] uppercase tracking-wider">
-           
+            TALENT AI SYSTEM
           </div>
 
           <div className="flex items-center gap-3">
