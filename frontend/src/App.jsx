@@ -1,1134 +1,307 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Briefcase, Search, MapPin, DollarSign, Clock, Upload, 
-  FileText, CheckCircle2, AlertCircle, RefreshCw, Bot, 
-  Mail, Calendar as CalendarIcon, Check, X, Building, UserCheck, 
-  Inbox, Send, Video, Sparkles, Plus, Trash2, Edit3, Layers, FileSpreadsheet, Settings
-} from 'lucide-react';
-
-// --- DỮ LIỆU KHỞI TẠO DỰ PHÒNG (KHI N8N OFFLINE) ---
-
-const initialJobs = [
-  {
-    job_id: 'JOB001',
-    job_title: 'Backend Developer',
-    job_description: 'Phát triển REST API, xây dựng chức năng backend và làm việc với cơ sở dữ liệu.',
-    required_skills: 'Java, Spring Boot, PostgreSQL, RESTful API, Git',
-    required_experience: 'Có kiến thức backend; ưu tiên kinh nghiệm xây dựng API và hệ thống thực tế.',
-    preferred_skills: 'Docker, Redis, Microservices, CI/CD',
-    work_type: 'Full-time',
-    benefits: 'Được hướng dẫn chuyên môn, tham gia dự án thực tế, bảo hiểm.',
-    deadline: '2026-10-11',
-    status: 'Open'
-  },
-  {
-    job_id: 'JOB002',
-    job_title: 'Chuyên viên Phân tích Dữ liệu (Data Analyst)',
-    job_description: 'Thu thập, xử lý và phân tích dữ liệu; xây dựng báo cáo, trực quan hóa dữ liệu và hỗ trợ các bộ phận đưa ra quyết định dựa trên dữ liệu.',
-    required_skills: 'SQL, Excel, Python, Data Analysis, Data Visualization',
-    required_experience: 'Có kiến thức về phân tích dữ liệu, xử lý dữ liệu và xây dựng báo cáo; ưu tiên ứng viên đã thực hiện dự án phân tích dữ liệu thực tế.',
-    preferred_skills: 'Power BI, Tableau, Pandas, Statistics, Machine Learning',
-    work_type: 'Full-time',
-    benefits: 'Được hướng dẫn chuyên môn, tham gia dự án phân tích dữ liệu thực tế, cơ hội đào tạo và phát triển nghề nghiệp, bảo hiểm.',
-    deadline: '2026-10-11',
-    status: 'Open'
-  },
-  {
-    job_id: 'JOB003',
-    job_title: 'Chuyên viên Truyền thông & Marketing (Marketing Executive)',
-    job_description: 'Lập kế hoạch và triển khai hoạt động truyền thông, xây dựng nội dung trên các kênh trực tuyến, hỗ trợ tổ chức sự kiện và theo dõi hiệu quả các chiến dịch marketing.',
-    required_skills: 'Content Marketing, Social Media, Copywriting, Communication, Marketing Planning',
-    required_experience: 'Có kiến thức về truyền thông và marketing; ưu tiên kinh nghiệm xây dựng nội dung, quản lý mạng xã hội hoặc triển khai chiến dịch truyền thông.',
-    preferred_skills: 'SEO, Canva, Digital Marketing, Google Analytics, Event Planning',
-    work_type: 'Full-time',
-    benefits: 'Được hướng dẫn chuyên môn, tham gia các chiến dịch truyền thông thực tế, cơ hội đào tạo và phát triển nghề nghiệp, bảo hiểm.',
-    deadline: '2026-10-11',
-    status: 'Open'
-  }
-];
-
-const initialParserCandidates = [
-  {
-    "Họ và tên": "NGUYỄN VĂN AN",
-    "Email": "nguyenvanan.dev@gmail.com",
-    "Số điện thoại": "0912345678",
-    "Kỹ năng": "Java, Spring Boot, PostgreSQL, Docker, Git, RESTful API, Redis, Microservices",
-    "Kinh nghiệm": "Junior Backend Developer tại Công ty TNHH Giải pháp Phần mềm ABC",
-    "Học Vấn": "Đại học Bách Khoa - Đại học Đà Nẵng (GPA 3.52/4.0)",
-    "Vị trí ứng tuyển": "Backend Developer",
-    "Thời gian nộp": "2026-10-09 21:07:27",
-    "job_id": "JOB001",
-    "Trạng thái gửi email cho HR": "Đã gửi"
-  },
-  {
-    "Họ và tên": "TRẦN MINH HOÀNG",
-    "Email": "hoang.tm.data@gmail.com",
-    "Số điện thoại": "0905123456",
-    "Kỹ năng": "SQL (PostgreSQL, MySQL), Python (Pandas, NumPy), Power BI, Tableau, Excel (Advanced)",
-    "Kinh nghiệm": "Chuyên viên Phân tích Dữ liệu tại Công ty TNHH Bán lẻ Global",
-    "Học Vấn": "Đại học Kinh tế - Đại học Đà Nẵng (GPA 3.6/4.0)",
-    "Vị trí ứng tuyển": "Chuyên viên Phân tích Dữ liệu (Data Analyst)",
-    "Thời gian nộp": "2026-10-10 07:48:18",
-    "job_id": "JOB002",
-    "Trạng thái gửi email cho HR": "Đã gửi"
-  },
-  {
-    "Họ và tên": "PHẠM THU TRANG",
-    "Email": "huynhhoangnhi1902@gmail.com",
-    "Số điện thoại": "0934567890",
-    "Kỹ năng": "Digital Marketing, Content Marketing, Facebook Ads, SEO / SEM, Canva & CapCut",
-    "Kinh nghiệm": "Chuyên viên Content & Digital Marketing tại SunMedia",
-    "Học Vấn": "Đại học Quốc gia TP.HCM - Trường ĐH KHXH&NV",
-    "Vị trí ứng tuyển": "Chuyên viên Truyền thông & Marketing (Marketing Executive)",
-    "Thời gian nộp": "2026-10-10 07:49:27",
-    "job_id": "JOB003",
-    "Trạng thái gửi email cho HR": "Đã gửi"
-  }
-];
-
-const initialMatchResults = [
-  {
-    "Họ và tên ứng viên": "NGUYỄN VĂN AN",
-    "Email ứng viên": "nguyenvanan.dev@gmail.com",
-    "Vị trí ứng tuyển": "Backend Developer",
-    "Mã tin tuyển dụng": "JOB001",
-    "Tên vị trí tuyển dụng": "Backend Developer",
-    "Điểm phù hợp": 10.0,
-    "Đề xuất đánh giá": "Strong Match",
-    "Kỹ năng bắt buộc phù hợp": "Java, Spring Boot, PostgreSQL, RESTful API, Git",
-    "Kỹ năng bắt buộc còn thiếu": "Không",
-    "Kỹ năng ưu tiên phù hợp": "Docker, Redis, Microservices, CI/CD",
-    "Kỹ năng ưu tiên còn thiếu": "Không",
-    "Lý do đánh giá": "Đáp ứng 5/5 kỹ năng bắt buộc. Đáp ứng 4/4 kỹ năng ưu tiên. Tìm thấy từ khóa kinh nghiệm liên quan đến vị trí.",
-    "Quyết định của HR": "Approve",
-    "Ngày phỏng vấn": "2026-11-14",
-    "Giờ phỏng vấn": "07:30",
-    "Trạng thái gửi email cho ứng viên": "Đã gửi"
-  },
-  {
-    "Họ và tên ứng viên": "TRẦN MINH HOÀNG",
-    "Email ứng viên": "hoang.tm.data@gmail.com",
-    "Vị trí ứng tuyển": "Chuyên viên Phân tích Dữ liệu (Data Analyst)",
-    "Mã tin tuyển dụng": "JOB002",
-    "Tên vị trí tuyển dụng": "Chuyên viên Phân tích Dữ liệu (Data Analyst)",
-    "Điểm phù hợp": 6.4,
-    "Đề xuất đánh giá": "Potential Match",
-    "Kỹ năng bắt buộc phù hợp": "SQL, Excel, Python",
-    "Kỹ năng bắt buộc còn thiếu": "Data Analysis, Data Visualization",
-    "Kỹ năng ưu tiên phù hợp": "Power BI, Tableau, Pandas",
-    "Kỹ năng ưu tiên còn thiếu": "Statistics, Machine Learning",
-    "Lý do đánh giá": "Đáp ứng 3/5 kỹ năng bắt buộc. Đáp ứng 3/5 kỹ năng ưu tiên. Kỹ năng bắt buộc cần kiểm tra thêm: Data Analysis, Data Visualization.",
-    "Quyết định của HR": "Reject",
-    "Ngày phỏng vấn": "-",
-    "Giờ phỏng vấn": "-",
-    "Trạng thái gửi email cho ứng viên": "Đã gửi"
-  },
-  {
-    "Họ và tên ứng viên": "PHẠM THU TRANG",
-    "Email ứng viên": "huynhhoangnhi1902@gmail.com",
-    "Vị trí ứng tuyển": "Chuyên viên Truyền thông & Marketing (Marketing Executive)",
-    "Mã tin tuyển dụng": "JOB003",
-    "Tên vị trí tuyển dụng": "Chuyên viên Truyền thông & Marketing (Marketing Executive)",
-    "Điểm phù hợp": 5.4,
-    "Đề xuất đánh giá": "Low Match",
-    "Kỹ năng bắt buộc phù hợp": "Content Marketing, Copywriting",
-    "Kỹ năng bắt buộc còn thiếu": "Social Media, Communication, Marketing Planning",
-    "Kỹ năng ưu tiên phù hợp": "SEO, Canva, Digital Marketing, Google Analytics",
-    "Kỹ năng ưu tiên còn thiếu": "Event Planning",
-    "Lý do đánh giá": "Đáp ứng 2/5 kỹ năng bắt buộc. Đáp ứng 4/5 kỹ năng ưu tiên. Kỹ năng bắt buộc cần kiểm tra thêm: Social Media, Communication, Marketing Planning.",
-    "Quyết định của HR": "Pending Review",
-    "Ngày phỏng vấn": "-",
-    "Giờ phỏng vấn": "-",
-    "Trạng thái gửi email cho ứng viên": "Chưa gửi"
-  }
-];
+import CandidatePortal from './components/CandidatePortal';
+import AdminPortal from './components/AdminPortal';
+import ConfigModal from './components/ConfigModal';
+import Toast from './components/Toast';
+import { Briefcase, LogOut, Mail, Lock, ArrowRight } from 'lucide-react';
 
 export default function App() {
-  const [appMode, setAppMode] = useState('CANDIDATE'); // 'CANDIDATE' | 'ADMIN'
-  const [adminTab, setAdminTab] = useState(1); // 1, 2, 3
-  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('recruit_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+  
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
-  // Webhook Endpoints
-  const [webhookUrl, setWebhookUrl] = useState('http://localhost:5678/webhook/upload-cv');
-  const [hrWebhookUrl, setHrWebhookUrl] = useState('http://localhost:5678/webhook/hr-decision');
-  const [getDataUrl, setGetDataUrl] = useState('http://localhost:5678/webhook/get-sheet-data');
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState(null);
   const [showConfigModal, setShowConfigModal] = useState(false);
 
-  // Core App States
-  const [jobs, setJobs] = useState(initialJobs);
-  const [parserCandidates, setParserCandidates] = useState(initialParserCandidates);
-  const [matchResults, setMatchResults] = useState(initialMatchResults);
-  const [isLoading, setIsLoading] = useState(false);
+  // 3 Email quản trị cố định
+  const ADMIN_EMAILS = [
+    'huynhhoangnhi1902@gmail.com',
+    'phanthi04072006@gmail.com',
+    'uyenthu160706@gmail.com'
+  ];
 
-  // Job Modal State (Admin CRUD)
-  const [showJobModal, setShowJobModal] = useState(false);
-  const [editingJob, setEditingJob] = useState(null);
-  const [jobForm, setJobForm] = useState({
-    job_id: '',
-    job_title: '',
-    job_description: '',
-    required_skills: '',
-    required_experience: '',
-    preferred_skills: '',
-    work_type: 'Full-time',
-    benefits: 'Được hướng dẫn chuyên môn, tham gia dự án thực tế, bảo hiểm.',
-    deadline: '2026-12-31',
-    status: 'Open'
+  // Lưu trữ jobs vào localStorage để đồng bộ giữa Admin và Ứng viên
+  const [jobs, setJobs] = useState(() => {
+    const savedJobs = localStorage.getItem('recruit_jobs');
+    if (savedJobs) {
+      try { return JSON.parse(savedJobs); } catch (e) { }
+    }
+    return [
+      {
+        job_id: 'JOB001',
+        job_title: 'Java Backend Developer',
+        job_description: 'Xây dựng và phát triển các hệ thống microservices sử dụng Java Spring Boot và MySQL.',
+        required_skills: 'Java, Spring Boot, MySQL, RESTful API',
+        preferred_skills: 'Docker, Redis, Microservices',
+        required_experience: '1 - 3 năm',
+        work_type: 'Full-time',
+        benefits: 'Thưởng quý, bảo hiểm cao cấp, đào tạo chứng chỉ',
+        deadline: '2026-12-31',
+        status: 'Open'
+      },
+      {
+        job_id: 'JOB002',
+        job_title: 'Frontend React Developer',
+        job_description: 'Phát triển giao diện ứng dụng web SPA với React, Tailwind CSS và Redux Toolkit.',
+        required_skills: 'React, JavaScript, HTML5, CSS3, Tailwind CSS',
+        preferred_skills: 'TypeScript, Next.js, Vite',
+        required_experience: '1 - 2 năm',
+        work_type: 'Full-time',
+        benefits: 'Thưởng dự án, trợ cấp thiết bị, môi trường hybrid',
+        deadline: '2026-12-31',
+        status: 'Open'
+      }
+    ];
   });
 
-  // Candidate Modal State
-  const [searchJob, setSearchJob] = useState('');
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [showApplyModal, setShowApplyModal] = useState(false);
-  const [applyFile, setApplyFile] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Tự động lưu lại mỗi khi jobs thay đổi
+  useEffect(() => {
+    localStorage.setItem('recruit_jobs', JSON.stringify(jobs));
+  }, [jobs]);
+
+  const [parserCandidates, setParserCandidates] = useState([
+    {
+      "Họ và tên": "NGUYỄN VĂN AN",
+      "Email": "nguyenvanan.dev@gmail.com",
+      "Số điện thoại": "0905123456",
+      "Kỹ năng": "Java, Spring Boot, MySQL, Docker, RESTful API",
+      "Kinh nghiệm": "2 năm lập trình Java Web",
+      "Học Vấn": "Cử nhân Công nghệ Thông tin",
+      "Vị trí ứng tuyển": "Java Backend Developer",
+      "Thời gian nộp": "2026-11-01 09:30:00",
+      "job_id": "JOB001",
+      "Trạng thái gửi email cho HR": "Đã gửi"
+    }
+  ]);
+
+  const [matchResults, setMatchResults] = useState([
+    {
+      "Họ và tên ứng viên": "NGUYỄN VĂN AN",
+      "Email ứng viên": "nguyenvanan.dev@gmail.com",
+      "Vị trí ứng tuyển": "Java Backend Developer",
+      "Mã tin tuyển dụng": "JOB001",
+      "Tên vị trí tuyển dụng": "Java Backend Developer",
+      "Điểm phù hợp": 9.0,
+      "Đề xuất đánh giá": "Phù hợp cao",
+      "Kỹ năng bắt buộc phù hợp": "Java, Spring Boot, MySQL, RESTful API",
+      "Kỹ năng bắt buộc còn thiếu": "Không",
+      "Kỹ năng ưu tiên phù hợp": "Docker",
+      "Kỹ năng ưu tiên còn thiếu": "Redis, Microservices",
+      "Lý do đánh giá": "Ứng viên đáp ứng 100% kỹ năng cốt lõi và có kinh nghiệm thực tế.",
+      "Quyết định của HR": "Pending Review",
+      "Ngày phỏng vấn": "-",
+      "Giờ phỏng vấn": "-",
+      "Google Meet": "",
+      "Trạng thái gửi email cho ứng viên": "Chưa gửi"
+    }
+  ]);
+
+  const [n8nConfig, setN8nConfig] = useState({
+    uploadCvUrl: 'http://localhost:5678/webhook/upload-cv',
+    jobManagementUrl: 'http://localhost:5678/webhook/manage-jobs',
+    hrDecisionUrl: 'http://localhost:5678/webhook/hr-decision',
+    getSheetDataUrl: 'http://localhost:5678/webhook/get-sheet-data'
+  });
 
   const showToast = (message, type = 'success') => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => setNotification({ show: false, message: '', type: 'success' }), 4000);
+    setToast({ message, type });
   };
 
-  // --- FETCH LIVE DATA FROM N8N / GOOGLE SHEETS ---
   const fetchSheetData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(getDataUrl);
+      const res = await fetch(n8nConfig.getSheetDataUrl);
       if (res.ok) {
         const data = await res.json();
-        if (data.jobs && data.jobs.length > 0) setJobs(data.jobs);
+        if (data.jobs && data.jobs.length > 0) {
+          setJobs(data.jobs);
+          localStorage.setItem('recruit_jobs', JSON.stringify(data.jobs));
+        }
         if (data.parserCandidates && data.parserCandidates.length > 0) setParserCandidates(data.parserCandidates);
         if (data.matchResults && data.matchResults.length > 0) setMatchResults(data.matchResults);
-        showToast('Đã đồng bộ dữ liệu mới nhất từ Google Sheet qua n8n! ');
+        showToast('Đã đồng bộ dữ liệu mới nhất từ Google Sheet!');
+      } else {
+        showToast('Đang hiển thị dữ liệu lưu trữ.', 'info');
       }
     } catch (err) {
-      console.log('n8n Webhook Offline: Đang sử dụng dữ liệu khởi tạo local.');
+      console.warn('Lỗi gọi Webhook n8n:', err);
+      showToast('Đang hiển thị dữ liệu lưu trữ.', 'info');
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchSheetData();
-  }, []);
-
-  // --- JOB CRUD HANDLERS ---
-  const handleOpenAddJob = () => {
-    setEditingJob(null);
-    setJobForm({
-      job_id: `JOB00${jobs.length + 1}`,
-      job_title: '',
-      job_description: '',
-      required_skills: '',
-      required_experience: '',
-      preferred_skills: '',
-      work_type: 'Full-time',
-      benefits: 'Được hướng dẫn chuyên môn, tham gia dự án thực tế, bảo hiểm.',
-      deadline: '2026-12-31',
-      status: 'Open'
-    });
-    setShowJobModal(true);
-  };
-
-  const handleOpenEditJob = (job) => {
-    setEditingJob(job);
-    setJobForm({ ...job });
-    setShowJobModal(true);
-  };
-
-  const handleDeleteJob = (jobId) => {
-    if (window.confirm(`Bạn có chắc chắn muốn xóa vị trí mã ${jobId}?`)) {
-      setJobs(prev => prev.filter(j => j.job_id !== jobId));
-      showToast(`Đã xóa thành công vị trí công việc ${jobId}!`, 'warning');
-    }
-  };
-
-  const handleSaveJob = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    if (!jobForm.job_title || !jobForm.required_skills) {
-      showToast('Vui lòng điền đầy đủ tiêu đề và kỹ năng bắt buộc!', 'error');
+    if (!loginEmail.trim()) {
+      showToast('Vui lòng nhập địa chỉ email.', 'error');
       return;
     }
 
-    if (editingJob) {
-      setJobs(prev => prev.map(j => j.job_id === editingJob.job_id ? { ...jobForm } : j));
-      showToast(`Cập nhật vị trí ${jobForm.job_id} thành công! `);
+    const emailLower = loginEmail.trim().toLowerCase();
+    const isAdmin = ADMIN_EMAILS.includes(emailLower);
+
+    const userData = {
+      email: emailLower,
+      role: isAdmin ? 'admin' : 'candidate'
+    };
+
+    setCurrentUser(userData);
+    localStorage.setItem('recruit_user', JSON.stringify(userData));
+
+    if (isAdmin) {
+      showToast('Đăng nhập thành công với quyền Quản trị viên!');
     } else {
-      setJobs(prev => [jobForm, ...prev]);
-      showToast(`Thêm mới vị trí ${jobForm.job_id} thành công! `);
-    }
-    setShowJobModal(false);
-  };
-
-  // --- SUBMIT CV TO N8N WF1 WEBHOOK ---
-  const handleApplySubmit = async (e) => {
-    e.preventDefault();
-    if (!applyFile) {
-      showToast('Vui lòng chọn file CV định dạng PDF!', 'error');
-      return;
-    }
-
-    setIsSubmitting(true);
-    showToast('Đang gửi CV tới n8n Webhook & ghi dữ liệu Google Sheets...', 'info');
-
-    try {
-      const formData = new FormData();
-      formData.append('data', applyFile);
-      formData.append('job_id', selectedJob.job_id);
-      formData.append('job_title', selectedJob.job_title);
-
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) throw new Error(`Server response status: ${response.status}`);
-
-      showToast('Nộp CV thành công! n8n đang bóc tách và đồng bộ sang Google Sheet. ');
-      fetchSheetData();
-
-    } catch (err) {
-      console.warn('Kết nối n8n Webhook thất bại, bật chế độ cập nhật UI dự phòng:', err);
-      showToast('Đã ghi nhận hồ sơ ứng tuyển (Chế độ xem trước dữ liệu).', 'warning');
-
-      const candidateName = applyFile.name.replace(/\.[^/.]+$/, "").toUpperCase();
-
-      const newParserRecord = {
-        "Họ và tên": candidateName,
-        "Email": "ungvien.moi@gmail.com",
-        "Số điện thoại": "0905999888",
-        "Kỹ năng": selectedJob.required_skills,
-        "Kinh nghiệm": "Đang được n8n & Groq LLM bóc tách...",
-        "Học Vấn": "Đại học CNTT",
-        "Vị trí ứng tuyển": selectedJob.job_title,
-        "Thời gian nộp": new Date().toISOString().slice(0, 19).replace('T', ' '),
-        "job_id": selectedJob.job_id,
-        "Trạng thái gửi email cho HR": "Đã gửi"
-      };
-
-      const newMatchRecord = {
-        "Họ và tên ứng viên": candidateName,
-        "Email ứng viên": "ungvien.moi@gmail.com",
-        "Vị trí ứng tuyển": selectedJob.job_title,
-        "Mã tin tuyển dụng": selectedJob.job_id,
-        "Tên vị trí tuyển dụng": selectedJob.job_title,
-        "Điểm phù hợp": 8.5,
-        "Đề xuất đánh giá": "Strong Match",
-        "Kỹ năng bắt buộc phù hợp": selectedJob.required_skills,
-        "Kỹ năng bắt buộc còn thiếu": "Không",
-        "Kỹ năng ưu tiên phù hợp": selectedJob.preferred_skills,
-        "Kỹ năng ưu tiên còn thiếu": "Không",
-        "Lý do đánh giá": "Hồ sơ đáp ứng tốt các từ khóa kỹ năng chính của vị trí.",
-        "Quyết định của HR": "Pending Review",
-        "Ngày phỏng vấn": "-",
-        "Giờ phỏng vấn": "-",
-        "Trạng thái gửi email cho ứng viên": "Chưa gửi"
-      };
-
-      setParserCandidates([newParserRecord, ...parserCandidates]);
-      setMatchResults([newMatchRecord, ...matchResults]);
-    } finally {
-      setIsSubmitting(false);
-      setShowApplyModal(false);
-      setApplyFile(null);
-      setSelectedJob(null);
+      showToast('Đăng nhập thành công vào Cổng ứng viên!');
     }
   };
 
-  // --- HR DECISION TO N8N WF3 WEBHOOK ---
-  const handleHRDecision = async (candidateName, email, status) => {
-    // Optimistic UI Update
-    setMatchResults(prev => prev.map(c => {
-      if (c["Họ và tên ứng viên"] === candidateName) {
-        return {
-          ...c,
-          "Quyết định của HR": status,
-          "Trạng thái gửi email cho ứng viên": 'Đã gửi',
-          "Ngày phỏng vấn": status === 'Approve' ? '2026-11-10' : '-',
-          "Giờ phỏng vấn": status === 'Approve' ? '09:00' : '-',
-        };
-      }
-      return c;
-    }));
-
-    try {
-      const res = await fetch(hrWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          candidate_name: candidateName,
-          email: email,
-          decision: status
-        })
-      });
-
-      if (res.ok) {
-        showToast(`Đã chuyển quyết định ${status} sang n8n WF3 (Cập nhật Sheet & Gửi Mail/Lịch)! `);
-      } else {
-        showToast(`Đã lưu trạng thái ${status} trên UI.`);
-      }
-    } catch (err) {
-      console.warn('Lỗi gọi n8n WF3 Webhook:', err);
-      showToast(`Đã cập nhật trạng thái ${status} (Giao diện xem trước).`);
-    }
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('recruit_user');
+    showToast('Đã đăng xuất khỏi hệ thống.');
   };
 
-  // ============================================================================
-  // RENDER: CANDIDATE PORTAL (TÔNG XANH NHẠT DỊU MẮT)
-  // ============================================================================
-  const renderCandidatePortal = () => {
-    const filteredJobs = jobs.filter(j => 
-      j.job_title.toLowerCase().includes(searchJob.toLowerCase()) || 
-      j.job_description.toLowerCase().includes(searchJob.toLowerCase())
-    );
-
+  // MÀN HÌNH ĐĂNG NHẬP
+  if (!currentUser) {
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-16">
-        {/* Sky Blue Banner */}
-        <div className="bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 text-white pt-14 pb-24 px-4 relative shadow-sm">
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <span className="bg-white/20 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-4 inline-flex items-center gap-1.5 border border-white/30 backdrop-blur-md shadow-sm">
-              <Sparkles className="w-4 h-4 text-sky-100" /> Hệ thống Tuyển dụng AI & n8n Automation
-            </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold mb-3 leading-tight tracking-tight">
-              Cơ Hội Nghề Nghiệp Dành Cho Bạn 
-            </h1>
-            <p className="text-sky-100 text-base md:text-lg mb-8 max-w-2xl mx-auto font-medium">
-              Tải CV PDF của bạn lên để n8n & Groq AI phân tích kỹ năng và kết nối trực tiếp đến nhà tuyển dụng.
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#174EA6]/90 to-slate-900 flex items-center justify-center p-4">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl max-w-md w-full p-8 md:p-10 shadow-2xl border border-white/20 relative overflow-hidden">
+          
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="text-center mb-8">
+            <div className="w-14 h-14 bg-[#174EA6] text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
+              <Briefcase size={28} />
+            </div>
+            <h1 className="text-2xl font-black text-slate-800 tracking-tight">Cổng Tuyển Dụng</h1>
+            <p className="text-xs text-slate-500 mt-1.5 font-medium">
+              Đăng nhập để quản lý hoặc ứng tuyển vị trí việc làm.
             </p>
-            
-            <div className="bg-white rounded-2xl p-2 flex items-center shadow-lg max-w-2xl mx-auto border border-sky-100">
-              <Search className="w-6 h-6 text-sky-500 ml-3" />
-              <input 
-                type="text" 
-                placeholder="Tìm vị trí tuyển dụng..." 
-                value={searchJob}
-                onChange={(e) => setSearchJob(e.target.value)}
-                className="w-full bg-transparent border-none text-slate-800 px-4 py-2.5 focus:outline-none text-sm md:text-base font-medium placeholder:text-slate-400"
-              />
-              <button className="bg-sky-500 hover:bg-sky-600 text-white px-7 py-3 rounded-xl font-bold transition shrink-0 shadow-sm">
-                Tìm Kiếm
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Job Cards Section */}
-        <div className="max-w-5xl mx-auto px-4 -mt-10 relative z-20">
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-sky-600" />
-              <h2 className="text-base font-bold text-slate-900">Vị trí đang tuyển dụng ({filteredJobs.length})</h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={fetchSheetData}
-                className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold px-3 py-1.5 rounded-lg border border-sky-200 transition flex items-center gap-1"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Đồng bộ dữ liệu
-              </button>
-              <button
-                onClick={() => setShowConfigModal(true)}
-                className="text-xs bg-white text-slate-700 hover:bg-slate-50 font-bold px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm transition flex items-center gap-1"
-              >
-                <Settings className="w-3.5 h-3.5 text-slate-500" /> Cấu hình Webhook
-              </button>
-            </div>
           </div>
 
-          <div className="grid gap-5">
-            {filteredJobs.map(job => (
-              <div 
-                key={job.job_id} 
-                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md border border-slate-200 hover:border-sky-300 transition-all group"
-              >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-sky-600 text-white px-2.5 py-0.5 rounded-md text-xs font-mono font-bold">{job.job_id}</span>
-                      <span className="bg-sky-50 text-sky-800 px-3 py-0.5 rounded-md text-xs font-bold border border-sky-200">{job.work_type}</span>
-                      <span className="bg-emerald-50 text-emerald-700 px-3 py-0.5 rounded-md text-xs font-bold border border-emerald-200">{job.status}</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-sky-600 transition">{job.job_title}</h3>
-                    <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm text-slate-600 font-medium">
-                      <span className="flex items-center gap-1"><Clock className="w-4 h-4 text-slate-400" /> Hạn nộp: {job.deadline}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <button 
-                      onClick={() => setSelectedJob(job)}
-                      className="px-4 py-2.5 text-slate-700 hover:bg-slate-100 rounded-xl text-sm font-bold border border-slate-200 transition"
-                    >
-                      Chi tiết
-                    </button>
-                    <button 
-                      onClick={() => { setSelectedJob(job); setShowApplyModal(true); }}
-                      className="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-1.5"
-                    >
-                      <Upload className="w-4 h-4" /> Ứng Tuyển
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Modal Job Details */}
-        {selectedJob && !showApplyModal && (
-          <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-xl relative border border-sky-100">
-              <button onClick={() => setSelectedJob(null)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100">
-                <X className="w-6 h-6" />
-              </button>
-              
-              <span className="bg-sky-100 text-sky-800 px-3 py-1 rounded-md text-xs font-bold mb-3 inline-block">{selectedJob.job_id}</span>
-              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4">{selectedJob.job_title}</h2>
-              
-              <div className="space-y-5 text-sm text-slate-700">
-                <div>
-                  <h3 className="font-bold text-slate-900 text-base mb-1">Mô tả công việc</h3>
-                  <p className="leading-relaxed text-slate-600">{selectedJob.job_description}</p>
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-base mb-1">Yêu cầu kỹ năng bắt buộc</h3>
-                  <p className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-sky-900 font-semibold">{selectedJob.required_skills}</p>
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-base mb-1">Kỹ năng ưu tiên</h3>
-                  <p className="p-3 bg-sky-50/50 rounded-xl border border-sky-100 text-sky-800 font-medium">{selectedJob.preferred_skills}</p>
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-base mb-1">Kinh nghiệm & Quyền lợi</h3>
-                  <p className="text-slate-600">{selectedJob.required_experience}</p>
-                  <p className="text-slate-600 mt-1">{selectedJob.benefits}</p>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-5 border-t border-slate-100 flex justify-end">
-                <button 
-                  onClick={() => setShowApplyModal(true)}
-                  className="w-full md:w-auto px-8 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold shadow-md transition"
-                >
-                  Nộp Hồ Sơ Vị Trí Này
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal Apply Form */}
-        {showApplyModal && selectedJob && (
-          <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-xl relative border border-sky-100">
-              <button onClick={() => setShowApplyModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100">
-                <X className="w-5 h-5" />
-              </button>
-              
-              <div className="text-center mb-6">
-                <div className="w-12 h-12 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <Upload className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900">Nộp Hồ Sơ Ứng Tuyển</h3>
-                <p className="text-xs text-sky-700 font-bold mt-1 bg-sky-50 px-3 py-1 rounded-full inline-block border border-sky-200">{selectedJob.job_title}</p>
-              </div>
-
-              <form onSubmit={handleApplySubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">Tải lên file CV (Định dạng PDF) *</label>
-                  <div className="border-2 border-dashed border-sky-200 hover:border-sky-400 rounded-2xl p-6 text-center bg-sky-50/30 hover:bg-sky-50/60 transition cursor-pointer relative">
-                    <input 
-                      type="file" 
-                      accept=".pdf"
-                      required
-                      onChange={(e) => setApplyFile(e.target.files[0])}
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    />
-                    <FileText className="w-10 h-10 text-sky-400 mx-auto mb-2" />
-                    {applyFile ? (
-                      <p className="text-sm font-bold text-emerald-600 bg-emerald-50 py-1.5 px-3 rounded-lg border border-emerald-200 inline-block">{applyFile.name}</p>
-                    ) : (
-                      <>
-                        <p className="text-xs text-slate-800 font-bold">Bấm chọn file PDF hoặc kéo thả vào đây</p>
-                        <p className="text-[11px] text-slate-400 mt-1">Dung lượng tối đa 10MB</p>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-3 bg-sky-50 rounded-xl border border-sky-200 text-xs text-slate-700 flex gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-sky-600 mt-0.5" />
-                  <span>File CV sẽ được gửi trực tiếp qua <b>n8n Webhook</b> để bóc tách bằng AI và ghi vào Google Sheet.</span>
-                </div>
-
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full bg-sky-500 hover:bg-sky-600 text-white rounded-xl py-3.5 font-bold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-white" /> Đang gửi qua n8n...
-                    </>
-                  ) : (
-                    'Xác Nhận Nộp Hồ Sơ'
-                  )}
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // ============================================================================
-  // RENDER: ADMIN PORTAL (TỰ ĐỘNG KHỚP 100% BẢNG GOOGLE SHEET)
-  // ============================================================================
-  const renderAdminPortal = () => {
-    return (
-      <div className="min-h-screen bg-slate-100 text-slate-800 font-sans flex flex-col">
-        {/* Admin Navigation Header Bar */}
-        <div className="bg-white border-b border-sky-200/80 px-4 md:px-8 pt-4 sticky top-16 z-30 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-sky-500 p-2 rounded-xl text-white shadow-sm">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-slate-900 leading-tight">Bảng Điều Khiển Quản Trị Hệ Thống (3 Người)</h2>
-                <p className="text-[11px] text-slate-500">Đồng bộ chính xác tên cột với Google Sheet Danh sách ứng viên.xlsx</p>
-              </div>
-            </div>
-            <button
-              onClick={fetchSheetData}
-              className="text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Tải Lại Dữ Liệu Sheet
-            </button>
-          </div>
-
-          {/* Admin Workflow Tabs */}
-          <div className="flex space-x-2 overflow-x-auto border-t border-slate-100 pt-2">
-            <button 
-              onClick={() => setAdminTab(1)}
-              className={`flex items-center gap-2 px-5 py-3 text-xs font-bold rounded-t-xl transition whitespace-nowrap ${adminTab === 1 ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:bg-sky-50'}`}
-            >
-              <Briefcase className="w-4 h-4" /> Người 1: Job_Postings & CV Parser
-            </button>
-            <button 
-              onClick={() => setAdminTab(2)}
-              className={`flex items-center gap-2 px-5 py-3 text-xs font-bold rounded-t-xl transition whitespace-nowrap ${adminTab === 2 ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:bg-sky-50'}`}
-            >
-              <Bot className="w-4 h-4" /> Người 2: CV_Match_Results (AI Scoring)
-            </button>
-            <button 
-              onClick={() => setAdminTab(3)}
-              className={`flex items-center gap-2 px-5 py-3 text-xs font-bold rounded-t-xl transition whitespace-nowrap ${adminTab === 3 ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:bg-sky-50'}`}
-            >
-              <UserCheck className="w-4 h-4" /> Người 3: HR Approval & Schedule
-              {matchResults.filter(c => c["Quyết định của HR"] === 'Pending Review').length > 0 && (
-                <span className="bg-amber-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full ml-1">
-                  {matchResults.filter(c => c["Quyết định của HR"] === 'Pending Review').length}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="flex-1 p-4 md:p-8 overflow-y-auto">
-          
-          {/* TAB 1: NGƯỜI 1 - SHEET: Job_Postings & SHEET: Danh sách ứng viên - CV Parser */}
-          {adminTab === 1 && (
-            <div className="space-y-6">
-              {/* Job Management Section */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-sky-100 shadow-sm">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-sky-600" /> Tab Sheet 1: <code>Job_Postings</code>
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-1">Quản lý các bài đăng tuyển dụng đồng bộ trực tiếp với Google Sheet</p>
-                </div>
-                <button 
-                  onClick={handleOpenAddJob}
-                  className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-sm transition flex items-center gap-1.5 shrink-0"
-                >
-                  <Plus className="w-4 h-4" /> Thêm Bài Đăng Mới
-                </button>
-              </div>
-
-              {/* Jobs Table */}
-              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-sky-50/50 text-sky-900 uppercase font-mono border-b border-slate-200">
-                      <tr>
-                        <th className="px-4 py-3">job_id</th>
-                        <th className="px-4 py-3">job_title</th>
-                        <th className="px-4 py-3">required_skills</th>
-                        <th className="px-4 py-3">work_type</th>
-                        <th className="px-4 py-3">deadline</th>
-                        <th className="px-4 py-3">status</th>
-                        <th className="px-4 py-3 text-center">Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {jobs.map(j => (
-                        <tr key={j.job_id} className="hover:bg-slate-50 transition">
-                          <td className="px-4 py-3 font-mono font-bold text-sky-600">{j.job_id}</td>
-                          <td className="px-4 py-3 font-bold text-slate-900 text-sm">{j.job_title}</td>
-                          <td className="px-4 py-3 max-w-xs truncate text-slate-600">{j.required_skills}</td>
-                          <td className="px-4 py-3 text-slate-600">{j.work_type}</td>
-                          <td className="px-4 py-3 text-slate-600">{j.deadline}</td>
-                          <td className="px-4 py-3 font-bold text-emerald-600">{j.status}</td>
-                          <td className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <button 
-                                onClick={() => handleOpenEditJob(j)}
-                                className="bg-sky-50 hover:bg-sky-100 text-sky-700 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-sky-200"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" /> Sửa
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteJob(j.job_id)}
-                                className="bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-rose-200"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" /> Xóa
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* CV Parser Intake Table */}
-              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div className="px-5 py-3.5 border-b border-slate-200 bg-sky-50/50 flex justify-between items-center">
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-sky-800 flex items-center gap-2">
-                    <FileSpreadsheet className="w-4 h-4 text-sky-600" /> Tab Sheet 2: <code>Danh sách ứng viên - CV Parser</code>
-                  </h3>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-500 uppercase font-mono border-b border-slate-200">
-                      <tr>
-                        <th className="px-4 py-3">Họ và tên</th>
-                        <th className="px-4 py-3">Email & Số điện thoại</th>
-                        <th className="px-4 py-3">Kỹ năng</th>
-                        <th className="px-4 py-3">Học Vấn</th>
-                        <th className="px-4 py-3">Vị trí ứng tuyển</th>
-                        <th className="px-4 py-3">Thời gian nộp</th>
-                        <th className="px-4 py-3">Trạng thái gửi email cho HR</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {parserCandidates.map((c, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50 transition">
-                          <td className="px-4 py-3 font-bold text-slate-900 text-sm">{c["Họ và tên"]}</td>
-                          <td className="px-4 py-3">
-                            <div className="font-bold text-slate-800">{c["Email"]}</div>
-                            <div className="text-[11px] text-slate-400 font-mono">{c["Số điện thoại"]}</div>
-                          </td>
-                          <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Kỹ năng"]}</td>
-                          <td className="px-4 py-3 max-w-xs truncate text-slate-600">{c["Học Vấn"]}</td>
-                          <td className="px-4 py-3 text-sky-700 font-bold">{c["Vị trí ứng tuyển"]} ({c["job_id"]})</td>
-                          <td className="px-4 py-3 text-slate-400 font-mono">{c["Thời gian nộp"]}</td>
-                          <td className="px-4 py-3 font-bold text-emerald-600">{c["Trạng thái gửi email cho HR"]}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: NGƯỜI 2 - SHEET: CV_Match_Results (AI Scoring & Matching) */}
-          {adminTab === 2 && (
-            <div className="space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-sky-100 shadow-sm">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Bot className="w-5 h-5 text-sky-600" /> Tab Sheet 3: <code>CV_Match_Results</code>
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-1">Kết quả đối chiếu từ khóa kỹ năng giữa CV và JD bằng n8n & Groq LLM</p>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-sky-50/50 text-sky-900 uppercase font-mono border-b border-slate-200">
-                      <tr>
-                        <th className="px-4 py-3">Họ và tên ứng viên</th>
-                        <th className="px-4 py-3 text-center">Điểm phù hợp</th>
-                        <th className="px-4 py-3">Đề xuất đánh giá</th>
-                        <th className="px-4 py-3">Kỹ năng bắt buộc (Khớp / Thiếu)</th>
-                        <th className="px-4 py-3">Lý do đánh giá</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {matchResults.map((c, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50 transition">
-                          <td className="px-4 py-4">
-                            <div className="font-bold text-slate-900 text-sm">{c["Họ và tên ứng viên"]}</div>
-                            <div className="text-[11px] text-slate-400 font-mono">{c["Email ứng viên"]}</div>
-                            <div className="text-[11px] text-sky-600 font-bold mt-0.5">{c["Tên vị trí tuyển dụng"]}</div>
-                          </td>
-                          <td className="px-4 py-4 text-center">
-                            <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl border font-bold text-sm ${
-                              c["Điểm phù hợp"] >= 8 ? 'border-emerald-300 text-emerald-700 bg-emerald-50' :
-                              c["Điểm phù hợp"] >= 6 ? 'border-amber-300 text-amber-700 bg-amber-50' :
-                              'border-rose-300 text-rose-700 bg-rose-50'
-                            }`}>
-                              {c["Điểm phù hợp"]}
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 font-bold text-slate-800">{c["Đề xuất đánh giá"]}</td>
-                          <td className="px-4 py-4 max-w-xs">
-                            <div className="text-emerald-700 font-semibold mb-0.5"> Khớp: {c["Kỹ năng bắt buộc phù hợp"]}</div>
-                            <div className="text-rose-600 font-semibold"> Thiếu: {c["Kỹ năng bắt buộc còn thiếu"]}</div>
-                          </td>
-                          <td className="px-4 py-4 max-w-xs">
-                            <p className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-[11px] text-slate-600 leading-relaxed">
-                              {c["Lý do đánh giá"]}
-                            </p>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: NGƯỜI 3 - HR DUYỆT & GỬI GMAIL/LỊCH PHỎNG VẤN */}
-          {adminTab === 3 && (
-            <div className="space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-sky-100 shadow-sm">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <UserCheck className="w-5 h-5 text-sky-600" /> Người 3: HR Duyệt Quyết Định & Lịch Phỏng Vấn
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Ghi đè trực tiếp cột <code>Quyết định của HR</code>  n8n WF3 quét tự động và gửi Gmail + Lịch
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-sky-50/50 text-sky-900 uppercase font-mono border-b border-slate-200">
-                          <tr>
-                            <th className="px-4 py-3">Ứng viên</th>
-                            <th className="px-4 py-3 text-center">Quyết định của HR</th>
-                            <th className="px-4 py-3">Lịch phỏng vấn</th>
-                            <th className="px-4 py-3">Email cho ứng viên</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 text-slate-700">
-                          {matchResults.map((c, idx) => (
-                            <tr key={idx} className="hover:bg-slate-50 transition">
-                              <td className="px-4 py-4">
-                                <div className="font-bold text-slate-900 text-sm">{c["Họ và tên ứng viên"]}</div>
-                                <div className="text-[11px] text-slate-400 font-mono">{c["Email ứng viên"]}</div>
-                                <div className="text-[11px] text-sky-600 font-bold mt-0.5">Điểm AI: {c["Điểm phù hợp"]}/10</div>
-                              </td>
-
-                              <td className="px-4 py-4 text-center">
-                                {c["Quyết định của HR"] === 'Pending Review' ? (
-                                  <div className="flex items-center justify-center gap-2">
-                                    <button 
-                                      onClick={() => handleHRDecision(c["Họ và tên ứng viên"], c["Email ứng viên"], 'Approve')}
-                                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm"
-                                    >
-                                      <Check className="w-3.5 h-3.5" /> Approve
-                                    </button>
-                                    <button 
-                                      onClick={() => handleHRDecision(c["Họ và tên ứng viên"], c["Email ứng viên"], 'Reject')}
-                                      className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm"
-                                    >
-                                      <X className="w-3.5 h-3.5" /> Reject
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <span className={`inline-flex items-center gap-1 font-bold text-xs px-3 py-1 rounded-full border ${
-                                    c["Quyết định của HR"] === 'Approve' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-800 border-rose-200'
-                                  }`}>
-                                    {c["Quyết định của HR"] === 'Approve' ? <Check className="w-3 h-3"/> : <X className="w-3 h-3"/>}
-                                    {c["Quyết định của HR"] === 'Approve' ? 'Approve' : 'Reject'}
-                                  </span>
-                                )}
-                              </td>
-
-                              <td className="px-4 py-4 font-mono font-semibold text-slate-700">
-                                {c["Ngày phỏng vấn"]} lúc {c["Giờ phỏng vấn"]}
-                              </td>
-
-                              <td className="px-4 py-4 text-xs font-bold">
-                                {c["Trạng thái gửi email cho ứng viên"] === 'Đã gửi' ? (
-                                  <span className="text-emerald-700 flex items-center gap-1">
-                                    <Mail className="w-3.5 h-3.5 text-emerald-600" /> Đã gửi email
-                                  </span>
-                                ) : (
-                                  <span className="text-slate-400 italic">Chưa gửi</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Widgets */}
-                <div className="space-y-4">
-                  <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
-                    <h3 className="font-bold text-xs text-slate-900 flex items-center gap-2 mb-3">
-                      <Inbox className="w-4 h-4 text-rose-500" /> Nhật Ký Gmail API
-                    </h3>
-                    <div className="space-y-2 text-xs">
-                      {matchResults.filter(c => c["Trạng thái gửi email cho ứng viên"] === 'Đã gửi').map((c, idx) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                          <p className="font-bold text-slate-900 truncate">{c["Họ và tên ứng viên"]}</p>
-                          <p className="text-[11px] text-slate-500">{c["Email ứng viên"]}</p>
-                          <p className="text-[10px] text-emerald-600 font-bold mt-1">Status: Sent via Gmail API</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
-                    <h3 className="font-bold text-xs text-slate-900 flex items-center gap-2 mb-3">
-                      <CalendarIcon className="w-4 h-4 text-sky-600" /> Lịch Google Calendar
-                    </h3>
-                    <div className="space-y-2 text-xs">
-                      {matchResults.filter(c => c["Quyết định của HR"] === 'Approve').map((c, idx) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-sky-50/60 border border-sky-100 border-l-4 border-l-sky-500">
-                          <p className="font-bold text-slate-900">{c["Họ và tên ứng viên"]} - {c["Tên vị trí tuyển dụng"]}</p>
-                          <p className="text-slate-600 mt-0.5">{c["Ngày phỏng vấn"]} lúc {c["Giờ phỏng vấn"]}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          )}
-
-        </div>
-
-        {/* MODAL CONFIG WEBHOOK */}
-        {showConfigModal && (
-          <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl relative border border-sky-100">
-              <button onClick={() => setShowConfigModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-full">
-                <X className="w-5 h-5" />
-              </button>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Cấu Hình URL n8n Webhook</h3>
-              <p className="text-xs text-slate-600 mb-4">Nhập URL nút Webhook trên n8n của bạn để nhận file CV và gửi duyệt HR.</p>
-              
-              <div className="space-y-3 text-xs">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Webhook WF1 Upload CV (POST):</label>
-                  <input 
-                    type="text" 
-                    value={webhookUrl} 
-                    onChange={(e) => setWebhookUrl(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 font-mono text-slate-900 outline-none focus:border-sky-500"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Webhook WF3 HR Decision (POST):</label>
-                  <input 
-                    type="text" 
-                    value={hrWebhookUrl} 
-                    onChange={(e) => setHrWebhookUrl(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 font-mono text-slate-900 outline-none focus:border-sky-500"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Webhook Read Sheet Data (GET):</label>
-                  <input 
-                    type="text" 
-                    value={getDataUrl} 
-                    onChange={(e) => setGetDataUrl(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 font-mono text-slate-900 outline-none focus:border-sky-500"
-                  />
-                </div>
-              </div>
-
-              <button 
-                onClick={() => { setShowConfigModal(false); showToast('Đã lưu cấu hình URL Webhook!'); }}
-                className="w-full bg-sky-500 text-white py-3 rounded-xl text-xs font-bold hover:bg-sky-600 transition mt-5"
-              >
-                Lưu Cấu Hình
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* MODAL ADD / EDIT JOB (ADMIN CRUD) */}
-        {showJobModal && (
-          <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-xl relative border border-sky-100">
-              <button onClick={() => setShowJobModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100">
-                <X className="w-6 h-6" />
-              </button>
-
-              <h3 className="text-2xl font-bold text-slate-900 mb-1">
-                {editingJob ? `Chỉnh Sửa Vị Trí: ${editingJob.job_id}` : 'Thêm Bài Đăng Tuyển Dụng Mới'}
-              </h3>
-              <p className="text-xs text-slate-500 font-medium mb-6">Đồng bộ dữ liệu trực tiếp vào tab Google Sheet <code>Job_Postings</code></p>
-
-              <form onSubmit={handleSaveJob} className="space-y-4 text-xs font-bold text-slate-700">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block mb-1">job_id *</label>
-                    <input 
-                      type="text" 
-                      required
-                      value={jobForm.job_id}
-                      onChange={(e) => setJobForm({ ...jobForm, job_id: e.target.value })}
-                      className="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-sky-500 font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-1">work_type *</label>
-                    <input 
-                      type="text" 
-                      value={jobForm.work_type}
-                      onChange={(e) => setJobForm({ ...jobForm, work_type: e.target.value })}
-                      className="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-sky-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block mb-1">job_title *</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="Ví dụ: Backend Developer..."
-                    value={jobForm.job_title}
-                    onChange={(e) => setJobForm({ ...jobForm, job_title: e.target.value })}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-sky-500 font-bold"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1">job_description</label>
-                  <textarea 
-                    rows={2}
-                    value={jobForm.job_description}
-                    onChange={(e) => setJobForm({ ...jobForm, job_description: e.target.value })}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-sky-500 font-normal"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1">required_skills *</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="Java, Spring Boot, PostgreSQL..."
-                    value={jobForm.required_skills}
-                    onChange={(e) => setJobForm({ ...jobForm, required_skills: e.target.value })}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-sky-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block mb-1">preferred_skills</label>
-                  <input 
-                    type="text" 
-                    placeholder="Docker, Redis..."
-                    value={jobForm.preferred_skills}
-                    onChange={(e) => setJobForm({ ...jobForm, preferred_skills: e.target.value })}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-sky-500"
-                  />
-                </div>
-
-                <div className="pt-4 flex justify-end gap-3">
-                  <button 
-                    type="button"
-                    onClick={() => setShowJobModal(false)}
-                    className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-bold hover:bg-slate-50 transition"
-                  >
-                    Hủy
-                  </button>
-                  <button 
-                    type="submit"
-                    className="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold shadow-sm transition"
-                  >
-                    {editingJob ? 'Lưu Cập Nhật' : 'Tạo Vị Trí Mới'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-      </div>
-    );
-  };
-
-  return (
-    <div className="min-h-screen flex flex-col font-sans bg-slate-100">
-      {/* Top Main Header */}
-      <header className="bg-white border-b border-sky-200/80 shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-sky-500 p-2 rounded-xl text-white shadow-sm">
-              <Building className="w-5 h-5" />
-            </div>
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <h1 className="font-extrabold text-lg text-slate-900 tracking-tight leading-none">
-                RecruitAI <span className="text-sky-600">n8n</span>
-              </h1>
-              <span className="text-[10px] text-slate-500 font-semibold">Automatic CV Matching & Google Sheets Sync</span>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                Địa chỉ Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-3 text-slate-400" size={18} />
+                <input
+                  type="email"
+                  required
+                  placeholder="name@example.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[#174EA6] focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all font-medium text-slate-800"
+                />
+              </div>
             </div>
-          </div>
-          
-          <div className="flex items-center bg-sky-50 p-1.5 rounded-xl border border-sky-200">
-            <button 
-              onClick={() => setAppMode('CANDIDATE')}
-              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition ${appMode === 'CANDIDATE' ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                Mật khẩu
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-3 text-slate-400" size={18} />
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[#174EA6] focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all font-medium text-slate-800"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-[#174EA6] hover:bg-[#0d3c85] text-white rounded-xl font-bold text-xs shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 transition-all flex items-center justify-center gap-2 mt-2 group cursor-pointer"
             >
-              Giao diện Ứng Viên
+              <span>Truy Cập Hệ Thống</span>
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <button 
-              onClick={() => setAppMode('ADMIN')}
-              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition ${appMode === 'ADMIN' ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+          </form>
+        </div>
+
+        {toast && (
+          <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+        )}
+      </div>
+    );
+  }
+
+  // SAU KHI ĐĂNG NHẬP
+  return (
+    <div className="min-h-screen bg-[#F3F6FC]">
+      <header className="bg-white border-b border-slate-200 px-6 py-3.5 sticky top-0 z-40 shadow-xs">
+        <div className="max-w-[1500px] mx-auto flex items-center justify-between">
+          <div className="text-xs font-bold text-[#174EA6] uppercase tracking-wider">
+           
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-600 hidden sm:inline">
+              Xin chào, <strong className="text-slate-800">{currentUser.email}</strong>
+            </span>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-lg border border-rose-200 transition-colors cursor-pointer"
             >
-              Giao diện Quản Trị Viên (3 Người)
+              <LogOut size={14} /> Đăng xuất
             </button>
           </div>
         </div>
       </header>
 
-      {/* Toast Notification */}
-      {notification.show && (
-        <div className={`fixed top-20 right-5 z-50 px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 text-xs font-bold text-white transition animate-bounce ${
-          notification.type === 'error' ? 'bg-rose-600' :
-          notification.type === 'warning' ? 'bg-amber-600' : 'bg-emerald-600'
-        }`}>
-          <CheckCircle2 className="w-4 h-4" />
-          <span>{notification.message}</span>
-        </div>
+      {currentUser.role === 'admin' ? (
+        <AdminPortal
+          jobs={jobs}
+          setJobs={setJobs}
+          parserCandidates={parserCandidates}
+          matchResults={matchResults}
+          setMatchResults={setMatchResults}
+          hrWebhookUrl={n8nConfig.hrDecisionUrl}
+          fetchSheetData={fetchSheetData}
+          isLoading={isLoading}
+          showToast={showToast}
+          setShowConfigModal={setShowConfigModal}
+        />
+      ) : (
+        <CandidatePortal
+          jobs={jobs}
+          parserCandidates={parserCandidates}
+          setParserCandidates={setParserCandidates}
+          matchResults={matchResults}
+          setMatchResults={setMatchResults}
+          webhookUrl={n8nConfig.uploadCvUrl}
+          fetchSheetData={fetchSheetData}
+          isLoading={isLoading}
+          showToast={showToast}
+        />
       )}
 
-      {/* Render Active View */}
-      {appMode === 'CANDIDATE' ? renderCandidatePortal() : renderAdminPortal()}
+      {showConfigModal && (
+        <ConfigModal
+          n8nConfig={n8nConfig}
+          setN8nConfig={setN8nConfig}
+          onClose={() => setShowConfigModal(false)}
+          showToast={showToast}
+        />
+      )}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

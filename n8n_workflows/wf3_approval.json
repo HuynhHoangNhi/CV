@@ -28,14 +28,14 @@
       "type": "n8n-nodes-base.googleSheetsTrigger",
       "typeVersion": 1,
       "position": [
-        192,
-        1488
+        -2032,
+        272
       ],
-      "id": "e19c635a-6ed4-4570-8366-5492be6eb178",
+      "id": "f453b9a7-74f5-432f-a820-c44bbcc20f54",
       "name": "Google Sheets Trigger",
       "credentials": {
         "googleSheetsTriggerOAuth2Api": {
-          "id": "cEF7DmSol8HBB07e",
+          "id": "ojBHJRSCmUicN7AD",
           "name": "Google Sheets Trigger account"
         }
       }
@@ -68,10 +68,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        432,
-        1488
+        -1792,
+        272
       ],
-      "id": "2c84a05d-24f5-45ca-b032-d8f304b253fb",
+      "id": "f3075fdf-b5c2-4d36-a97e-4a911c7a9604",
       "name": "If-Kiểm tra đã gửi Email"
     },
     {
@@ -129,10 +129,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        688,
-        1472
+        -1536,
+        256
       ],
-      "id": "9d39da5f-88c1-4c9f-b6d2-7db399281dec",
+      "id": "13c3f612-de2b-4959-803f-1a42e29f1c4c",
       "name": "Switch"
     },
     {
@@ -148,14 +148,14 @@
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        928,
-        1312
+        -1296,
+        96
       ],
-      "id": "1d731e70-fcc4-47ac-baaf-4d3c1b0cf676",
+      "id": "43f6c499-ff4a-459a-9334-aaefd73025ec",
       "name": "Lấy lịch trong ngày",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "ODItPqA3bR1ecpHH",
+          "id": "gM1WGmjoPFNG60yT",
           "name": "Google Calendar account"
         }
       }
@@ -167,10 +167,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1152,
-        1312
+        -1072,
+        96
       ],
-      "id": "c9a09150-5f08-4c88-a3f3-065c3c288846",
+      "id": "988ae89a-6185-4a6a-a904-ae5c54fce948",
       "name": "Code Check Trùng Lịch"
     },
     {
@@ -199,10 +199,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1376,
-        1312
+        -848,
+        96
       ],
-      "id": "4c9dfc2b-57e5-4819-a523-c7963b1f8d36",
+      "id": "c12a93d3-2f0f-49eb-aed5-ba0449282895",
       "name": "If - Lịch Trống?"
     },
     {
@@ -222,14 +222,14 @@
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        1616,
-        1200
+        -608,
+        -16
       ],
-      "id": "a69aa0a1-afe3-42ca-8135-9009bd2c8d27",
+      "id": "efcadb79-a92c-4587-ada0-6fc74c5c00e6",
       "name": "Create an event",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "ODItPqA3bR1ecpHH",
+          "id": "gM1WGmjoPFNG60yT",
           "name": "Google Calendar account"
         }
       }
@@ -244,15 +244,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1856,
-        1200
+        -368,
+        -16
       ],
-      "id": "77e776c9-9c33-4973-9aa4-3b2a8a4040f4",
+      "id": "05d69a05-52bd-40be-a969-3533a8314070",
       "name": "Send a message",
       "webhookId": "a6354130-8a87-4c45-9bbe-8d516f3e3183",
       "credentials": {
         "gmailOAuth2": {
-          "id": "d9Rl5bfIY0g1Pftw",
+          "id": "OWXAyV2Z3BYcoPKu",
           "name": "Gmail account"
         }
       }
@@ -314,14 +314,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        2096,
-        1200
+        -128,
+        -16
       ],
-      "id": "de0f1ee8-4d42-4b39-a6ef-8f6e2a21bdd3",
+      "id": "811445c1-595f-46c9-a86e-8a2e66102493",
       "name": "Update row in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "HMONN8OsdVtmrggq",
+          "id": "NFOkUMuEUcNzg0zT",
           "name": "Google Sheets account"
         }
       }
@@ -336,15 +336,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1616,
-        1424
+        -608,
+        208
       ],
-      "id": "1fbf96d7-fb06-416e-94c9-d89b12b69e4a",
+      "id": "4dc460f0-4067-49fb-beaa-c14ee990c4d7",
       "name": "Báo Trùng Lịch cho HR",
       "webhookId": "8bc9fa2f-a128-476e-82a5-2ab1df0b748b",
       "credentials": {
         "gmailOAuth2": {
-          "id": "d9Rl5bfIY0g1Pftw",
+          "id": "OWXAyV2Z3BYcoPKu",
           "name": "Gmail account"
         }
       }
@@ -359,15 +359,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        928,
-        1600
+        -1296,
+        384
       ],
-      "id": "8511adac-27c9-4f45-b208-1365373c8a09",
+      "id": "130af633-3008-49b6-a5f3-af47cf03e154",
       "name": "Send a message1",
       "webhookId": "18a13275-4577-420b-9a9f-bb4385dadef8",
       "credentials": {
         "gmailOAuth2": {
-          "id": "d9Rl5bfIY0g1Pftw",
+          "id": "OWXAyV2Z3BYcoPKu",
           "name": "Gmail account"
         }
       }
@@ -429,14 +429,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1152,
-        1600
+        -1072,
+        384
       ],
-      "id": "f26669a5-d90f-461d-9095-aebc1fe89f29",
+      "id": "42d17452-037b-4bbc-9852-05cf549c4b62",
       "name": "Update row in sheet1",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "HMONN8OsdVtmrggq",
+          "id": "NFOkUMuEUcNzg0zT",
           "name": "Google Sheets account"
         }
       }
@@ -560,6 +560,6 @@
   "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "4eeb9490923bde1d302c216ecf5db73101b42102d73c9b53de2f9791db4034ef"
+    "instanceId": "99388b8339efccbe9f14e88ced7079baf20ac00d5927e5a94fca2f60deaaf3ba"
   }
 }

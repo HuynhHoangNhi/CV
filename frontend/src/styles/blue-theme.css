@@ -1,0 +1,65 @@
+/* =====================================================
+   RECRUITMENT MANAGEMENT SYSTEM
+   Theme: Professional Corporate Blue & White
+   ===================================================== */
+
+:root {
+  --primary: #174ea6;
+  --primary-dark: #0d3c85;
+  --page-bg: #f3f6fc;
+  --border: #e2e8f0;
+}
+
+html, body {
+  background-color: var(--page-bg) !important;
+  color: #0f172a;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Khắc phục phông nền mờ Modal Popup (trong suốt, không bị phủ mảng xanh) */
+.fixed.inset-0,
+div[class*="fixed inset-0"] {
+  background-color: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(4px);
+}
+
+.fixed.inset-0 > div,
+div[class*="fixed inset-0"] > div {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Kiểu dáng bảng dữ liệu */
+table thead {
+  background-color: #eff4fb !important;
+}
+
+table thead th {
+  color: #334155 !important;
+  font-weight: 700;
+}
+
+table tbody tr:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Thanh cuộn */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
