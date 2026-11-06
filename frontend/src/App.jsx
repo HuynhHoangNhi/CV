@@ -101,11 +101,15 @@ export default function App() {
     }
   ]);
 
-  const [n8nConfig, setN8nConfig] = useState({
+  const [n8nConfig, setN8nConfig] = useState(() => {
+  const savedConfig = localStorage.getItem('n8nConfig');
+
+  return savedConfig ? JSON.parse(savedConfig) : {
     uploadCvUrl: 'https://n8n-production-2734a.up.railway.app/webhook/upload-cv',
     jobManagementUrl: 'https://n8n-production-2734a.up.railway.app/webhook/manage-jobs',
     hrDecisionUrl: 'https://n8n-production-2734a.up.railway.app/webhook/hr-decision',
     getSheetDataUrl: 'https://n8n-production-2734a.up.railway.app/webhook/get-sheet-data'
+  };
 });
 
   const showToast = (message, type = 'success') => {
