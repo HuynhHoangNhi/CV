@@ -11,12 +11,11 @@ import {
 } from "lucide-react";
 
 const DEFAULT_WEBHOOKS = {
-  upload: "http://localhost:5678/webhook/upload-cv",
-  decision: "http://localhost:5678/webhook/hr-decision",
-  data: "http://localhost:5678/webhook/get-sheet-data",
+  upload: "https://n8n-production-2734a.up.railway.app/webhook/upload-cv",
+  decision: "https://n8n-production-2734a.up.railway.app/webhook/hr-decision",
+  data: "https://n8n-production-2734a.up.railway.app/webhook/get-sheet-data",
   jobs: ""
 };
-
 const sampleJobs = [
   {
     job_id: "JOB001",
@@ -227,12 +226,15 @@ function App() {
   const [matches, setMatches] = useState(sampleMatches);
 
   const [webhooks, setWebhooks] = useState(() => {
-    try {
-      return { ...DEFAULT_WEBHOOKS, ...JSON.parse(localStorage.getItem("cv-agent-webhooks") || "{}") };
-    } catch {
-      return DEFAULT_WEBHOOKS;
-    }
-  });
+  try {
+    return {
+      ...DEFAULT_WEBHOOKS,
+      ...JSON.parse(localStorage.getItem("cv-agent-webhooks-v2") || "{}")
+    };
+  } catch {
+    return DEFAULT_WEBHOOKS;
+  }
+});
 
   const [loading, setLoading] = useState(false);
   const [syncError, setSyncError] = useState("");
@@ -274,9 +276,9 @@ function App() {
   };
 
   const saveWebhooks = (value) => {
-    setWebhooks(value);
-    localStorage.setItem("cv-agent-webhooks", JSON.stringify(value));
-  };
+  setWebhooks(value);
+  localStorage.setItem("cv-agent-webhooks-v2", JSON.stringify(value));
+};
 
   const fetchSheetData = async () => {
     if (!webhooks.data) {
