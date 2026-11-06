@@ -464,8 +464,6 @@ export default function App() {
 
             <Briefcase size={18} />
 
-            <span>AI Recruitment System</span>
-
             {isLoading && (
               <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full animate-pulse">
                 Đang đồng bộ...
