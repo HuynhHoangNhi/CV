@@ -5,8 +5,7 @@ export default function ConfigModal({ n8nConfig, setN8nConfig, onClose, showToas
   const handleSubmit = (e) => {
   e.preventDefault();
 
-  localStorage.setItem('n8nConfig', JSON.stringify(n8nConfig));
-
+  localStorage.setItem('n8nConfig_v2', JSON.stringify(n8nConfig));
   showToast('Cấu hình n8n API đã được cập nhật thành công!');
   onClose();
 };
