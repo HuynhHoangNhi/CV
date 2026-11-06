@@ -3,7 +3,7 @@ import CandidatePortal from './components/CandidatePortal';
 import AdminPortal from './components/AdminPortal';
 import ConfigModal from './components/ConfigModal';
 import Toast from './components/Toast';
-import { Briefcase, LogOut, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Briefcase, LogOut, Mail, Lock, ArrowRight, RefreshCw, Settings } from 'lucide-react';
 
 export default function App() {
   // Cấu hình URL mặc định chuẩn Railway
@@ -39,7 +39,6 @@ export default function App() {
     if (savedConfig) {
       try {
         const parsed = JSON.parse(savedConfig);
-        // Nếu config cũ trong localStorage có chứa 'localhost', tự động ghi đè bằng Railway
         if (parsed.uploadCvUrl && parsed.uploadCvUrl.includes('localhost')) {
           localStorage.setItem('n8nConfig', JSON.stringify(DEFAULT_RAILWAY_CONFIG));
           return DEFAULT_RAILWAY_CONFIG;
@@ -52,12 +51,10 @@ export default function App() {
     return DEFAULT_RAILWAY_CONFIG;
   });
 
-  // Tự động lưu n8nConfig khi thay đổi
   useEffect(() => {
     localStorage.setItem('n8nConfig', JSON.stringify(n8nConfig));
   }, [n8nConfig]);
 
-  // Lưu trữ jobs vào localStorage
   const [jobs, setJobs] = useState(() => {
     const savedJobs = localStorage.getItem('recruit_jobs');
     if (savedJobs) {
@@ -75,18 +72,6 @@ export default function App() {
         benefits: 'Thưởng quý, bảo hiểm cao cấp, đào tạo chứng chỉ',
         deadline: '2026-12-31',
         status: 'Open'
-      },
-      {
-        job_id: 'JOB002',
-        job_title: 'Frontend React Developer',
-        job_description: 'Phát triển giao diện ứng dụng web SPA với React, Tailwind CSS và Redux Toolkit.',
-        required_skills: 'React, JavaScript, HTML5, CSS3, Tailwind CSS',
-        preferred_skills: 'TypeScript, Next.js, Vite',
-        required_experience: '1 - 2 năm',
-        work_type: 'Full-time',
-        benefits: 'Thưởng dự án, trợ cấp thiết bị, môi trường hybrid',
-        deadline: '2026-12-31',
-        status: 'Open'
       }
     ];
   });
@@ -95,47 +80,14 @@ export default function App() {
     localStorage.setItem('recruit_jobs', JSON.stringify(jobs));
   }, [jobs]);
 
-  const [parserCandidates, setParserCandidates] = useState([
-    {
-      "Họ và tên": "NGUYỄN VĂN AN",
-      "Email": "nguyenvanan.dev@gmail.com",
-      "Số điện thoại": "0905123456",
-      "Kỹ năng": "Java, Spring Boot, MySQL, Docker, RESTful API",
-      "Kinh nghiệm": "2 năm lập trình Java Web",
-      "Học Vấn": "Cử nhân Công nghệ Thông tin",
-      "Vị trí ứng tuyển": "Java Backend Developer",
-      "Thời gian nộp": "2026-11-01 09:30:00",
-      "job_id": "JOB001",
-      "Trạng thái gửi email cho HR": "Đã gửi"
-    }
-  ]);
-
-  const [matchResults, setMatchResults] = useState([
-    {
-      "Họ và tên ứng viên": "NGUYỄN VĂN AN",
-      "Email ứng viên": "nguyenvanan.dev@gmail.com",
-      "Vị trí ứng tuyển": "Java Backend Developer",
-      "Mã tin tuyển dụng": "JOB001",
-      "Tên vị trí tuyển dụng": "Java Backend Developer",
-      "Điểm phù hợp": 9.0,
-      "Đề xuất đánh giá": "Phù hợp cao",
-      "Kỹ năng bắt buộc phù hợp": "Java, Spring Boot, MySQL, RESTful API",
-      "Kỹ năng bắt buộc còn thiếu": "Không",
-      "Kỹ năng ưu tiên phù hợp": "Docker",
-      "Kỹ năng ưu tiên còn thiếu": "Redis, Microservices",
-      "Lý do đánh giá": "Ứng viên đáp ứng 100% kỹ năng cốt lõi và có kinh nghiệm thực tế.",
-      "Quyết định của HR": "Pending Review",
-      "Ngày phỏng vấn": "-",
-      "Giờ phỏng vấn": "-",
-      "Google Meet": "",
-      "Trạng thái gửi email cho ứng viên": "Chưa gửi"
-    }
-  ]);
+  const [parserCandidates, setParserCandidates] = useState([]);
+  const [matchResults, setMatchResults] = useState([]);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
   };
 
+  // Hàm gọi dữ liệu từ Webhook n8n & Google Sheets
   const fetchSheetData = async () => {
     setIsLoading(true);
     try {
@@ -146,19 +98,30 @@ export default function App() {
           setJobs(data.jobs);
           localStorage.setItem('recruit_jobs', JSON.stringify(data.jobs));
         }
-        if (data.parserCandidates && data.parserCandidates.length > 0) setParserCandidates(data.parserCandidates);
-        if (data.matchResults && data.matchResults.length > 0) setMatchResults(data.matchResults);
+        if (data.parserCandidates && data.parserCandidates.length > 0) {
+          setParserCandidates(data.parserCandidates);
+        }
+        if (data.matchResults && data.matchResults.length > 0) {
+          setMatchResults(data.matchResults);
+        }
         showToast('Đã đồng bộ dữ liệu mới nhất từ Google Sheet!');
       } else {
-        showToast('Đang hiển thị dữ liệu lưu trữ.', 'info');
+        showToast('Không thể kết nối đến Webhook n8n.', 'error');
       }
     } catch (err) {
       console.warn('Lỗi gọi Webhook n8n:', err);
-      showToast('Đang hiển thị dữ liệu lưu trữ.', 'info');
+      showToast('Lỗi kết nối mạng khi đồng bộ Google Sheet.', 'error');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // TỰ ĐỘNG GỌI ĐỒNG BỘ NGAY KHI ĐĂNG NHẬP THÀNH CÔNG
+  useEffect(() => {
+    if (currentUser) {
+      fetchSheetData();
+    }
+  }, [currentUser]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -177,12 +140,7 @@ export default function App() {
 
     setCurrentUser(userData);
     localStorage.setItem('recruit_user', JSON.stringify(userData));
-
-    if (isAdmin) {
-      showToast('Đăng nhập thành công với quyền Quản trị viên!');
-    } else {
-      showToast('Đăng nhập thành công vào Cổng ứng viên!');
-    }
+    showToast(isAdmin ? 'Đăng nhập thành công với quyền Quản trị viên!' : 'Đăng nhập thành công vào Cổng ứng viên!');
   };
 
   const handleLogout = () => {
@@ -264,14 +222,33 @@ export default function App() {
     <div className="min-h-screen bg-[#F3F6FC]">
       <header className="bg-white border-b border-slate-200 px-6 py-3.5 sticky top-0 z-40 shadow-xs">
         <div className="max-w-[1500px] mx-auto flex items-center justify-between">
-          <div className="text-xs font-bold text-[#174EA6] uppercase tracking-wider">
-            TALENT AI SYSTEM
+          <div className="text-xs font-bold text-[#174EA6] uppercase tracking-wider flex items-center gap-2">
+            {isLoading && <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full animate-pulse">Đang đồng bộ...</span>}
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Nút đồng bộ thủ công */}
+            <button
+              onClick={fetchSheetData}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg border border-blue-200 transition-colors cursor-pointer disabled:opacity-50"
+              title="Đồng bộ lại từ Google Sheet"
+            >
+              <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} /> Đồng bộ
+            </button>
+
+            {/* Nút mở cấu hình modal */}
+            <button
+              onClick={() => setShowConfigModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition-colors cursor-pointer"
+            >
+              <Settings size={14} /> Cấu hình
+            </button>
+
             <span className="text-xs text-slate-600 hidden sm:inline">
               Xin chào, <strong className="text-slate-800">{currentUser.email}</strong>
             </span>
+
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-lg border border-rose-200 transition-colors cursor-pointer"
