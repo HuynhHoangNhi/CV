@@ -14,11 +14,16 @@ export default function CandidatePortal({
   const [applyFile, setApplyFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const filteredJobs = jobs.filter(j => 
-    j.job_title.toLowerCase().includes(searchJob.toLowerCase()) || 
-    j.job_description.toLowerCase().includes(searchJob.toLowerCase()) ||
-    j.required_skills.toLowerCase().includes(searchJob.toLowerCase())
-  );
+ const filteredJobs = jobs.filter(j => {
+  if (!j) return false;
+  const search = (searchJob || '').toLowerCase();
+  
+  const title = (j.job_title || '').toLowerCase();
+  const desc = (j.job_description || '').toLowerCase();
+  const skills = (j.required_skills || '').toLowerCase();
+  
+  return title.includes(search) || desc.includes(search) || skills.includes(search);
+});
 
   const handleApplySubmit = async (e) => {
     e.preventDefault();
