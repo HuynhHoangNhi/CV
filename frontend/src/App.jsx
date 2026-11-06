@@ -7,7 +7,7 @@ import { Briefcase, LogOut, Mail, Lock, ArrowRight } from 'lucide-react';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('recruit_user');
+    const savedConfig = localStorage.getItem('n8nConfig_v2');
     return saved ? JSON.parse(saved) : null;
   });
   
