@@ -3,12 +3,14 @@ import { X, Settings } from 'lucide-react';
 
 export default function ConfigModal({ n8nConfig, setN8nConfig, onClose, showToast }) {
   const handleSubmit = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  localStorage.setItem('n8nConfig_v2', JSON.stringify(n8nConfig));
-  showToast('Cấu hình n8n API đã được cập nhật thành công!');
-  onClose();
-};
+    // Lưu đồng bộ key 'n8nConfig' với App.jsx
+    localStorage.setItem('n8nConfig', JSON.stringify(n8nConfig));
+    if (showToast) showToast('Cấu hình n8n API đã được cập nhật thành công!');
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl relative border border-slate-200">
@@ -31,10 +33,10 @@ export default function ConfigModal({ n8nConfig, setN8nConfig, onClose, showToas
             <label className="block text-xs font-semibold text-slate-700 mb-1">WF1: Upload & Bóc Tách CV (POST)</label>
             <input
               type="text"
-              value={n8nConfig.uploadCvUrl || ''}
+              value={n8nConfig?.uploadCvUrl || ''}
               onChange={e => setN8nConfig({ ...n8nConfig, uploadCvUrl: e.target.value })}
-              placeholder="http://localhost:5678/webhook/upload-cv"
-              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#174EA6] focus:outline-none"
+              placeholder="https://n8n-production-2734a.up.railway.app/webhook/upload-cv"
+              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#174EA6] focus:outline-none text-slate-800"
             />
           </div>
 
@@ -42,10 +44,10 @@ export default function ConfigModal({ n8nConfig, setN8nConfig, onClose, showToas
             <label className="block text-xs font-semibold text-slate-700 mb-1">WF2: Quản lý Vị trí Tuyển dụng (POST/PUT)</label>
             <input
               type="text"
-              value={n8nConfig.jobManagementUrl || ''}
+              value={n8nConfig?.jobManagementUrl || ''}
               onChange={e => setN8nConfig({ ...n8nConfig, jobManagementUrl: e.target.value })}
-              placeholder="http://localhost:5678/webhook/manage-jobs"
-              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#174EA6] focus:outline-none"
+              placeholder="https://n8n-production-2734a.up.railway.app/webhook/manage-jobs"
+              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#174EA6] focus:outline-none text-slate-800"
             />
           </div>
 
@@ -53,10 +55,10 @@ export default function ConfigModal({ n8nConfig, setN8nConfig, onClose, showToas
             <label className="block text-xs font-semibold text-slate-700 mb-1">WF3: HR Decision, Phỏng vấn & Gửi email (POST)</label>
             <input
               type="text"
-              value={n8nConfig.hrDecisionUrl || ''}
+              value={n8nConfig?.hrDecisionUrl || ''}
               onChange={e => setN8nConfig({ ...n8nConfig, hrDecisionUrl: e.target.value })}
-              placeholder="http://localhost:5678/webhook/hr-decision"
-              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#174EA6] focus:outline-none"
+              placeholder="https://n8n-production-2734a.up.railway.app/webhook/hr-decision"
+              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#174EA6] focus:outline-none text-slate-800"
             />
           </div>
 
@@ -64,10 +66,10 @@ export default function ConfigModal({ n8nConfig, setN8nConfig, onClose, showToas
             <label className="block text-xs font-semibold text-slate-700 mb-1">Get Sheet Data (GET)</label>
             <input
               type="text"
-              value={n8nConfig.getSheetDataUrl || ''}
+              value={n8nConfig?.getSheetDataUrl || ''}
               onChange={e => setN8nConfig({ ...n8nConfig, getSheetDataUrl: e.target.value })}
-              placeholder="http://localhost:5678/webhook/get-sheet-data"
-              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#174EA6] focus:outline-none"
+              placeholder="https://n8n-production-2734a.up.railway.app/webhook/get-sheet-data"
+              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:border-[#174EA6] focus:outline-none text-slate-800"
             />
           </div>
 
