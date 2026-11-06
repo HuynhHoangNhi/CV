@@ -102,11 +102,11 @@ export default function App() {
   ]);
 
   const [n8nConfig, setN8nConfig] = useState({
-    uploadCvUrl: 'http://localhost:5678/webhook/upload-cv',
-    jobManagementUrl: 'http://localhost:5678/webhook/manage-jobs',
-    hrDecisionUrl: 'http://localhost:5678/webhook/hr-decision',
-    getSheetDataUrl: 'http://localhost:5678/webhook/get-sheet-data'
-  });
+    uploadCvUrl: 'https://n8n-production-2734a.up.railway.app/webhook/upload-cv',
+    jobManagementUrl: 'https://n8n-production-2734a.up.railway.app/webhook/manage-jobs',
+    hrDecisionUrl: 'https://n8n-production-2734a.up.railway.app/webhook/hr-decision',
+    getSheetDataUrl: 'https://n8n-production-2734a.up.railway.app/webhook/get-sheet-data'
+});
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
