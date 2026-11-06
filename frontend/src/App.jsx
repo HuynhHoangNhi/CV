@@ -88,33 +88,57 @@ export default function App() {
   };
 
   // Hàm gọi dữ liệu từ Webhook n8n & Google Sheets
-  const fetchSheetData = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch(n8nConfig.getSheetDataUrl);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.jobs && data.jobs.length > 0) {
-          setJobs(data.jobs);
-          localStorage.setItem('recruit_jobs', JSON.stringify(data.jobs));
-        }
-        if (data.parserCandidates && data.parserCandidates.length > 0) {
-          setParserCandidates(data.parserCandidates);
-        }
-        if (data.matchResults && data.matchResults.length > 0) {
-          setMatchResults(data.matchResults);
-        }
-        showToast('Đã đồng bộ dữ liệu mới nhất từ Google Sheet!');
-      } else {
-        showToast('Không thể kết nối đến Webhook n8n.', 'error');
+  // Đồng bộ dữ liệu từ Google Sheets thông qua n8n
+const fetchSheetData = async () => {
+  if (isLoading) return;
+
+  setIsLoading(true);
+
+  try {
+    const response = await fetch(n8nConfig.getSheetDataUrl, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json'
       }
-    } catch (err) {
-      console.warn('Lỗi gọi Webhook n8n:', err);
-      showToast('Lỗi kết nối mạng khi đồng bộ Google Sheet.', 'error');
-    } finally {
-      setIsLoading(false);
+    });
+
+    if (!response.ok) {
+      throw new Error(`Webhook trả về lỗi HTTP ${response.status}`);
     }
-  };
+
+    const data = await response.json();
+
+    if (data.success === false) {
+      throw new Error(data.message || 'n8n không thể đọc dữ liệu Google Sheets');
+    }
+
+    // Luôn cập nhật cả 3 danh sách, kể cả khi mảng rỗng
+    setJobs(Array.isArray(data.jobs) ? data.jobs : []);
+    setParserCandidates(
+      Array.isArray(data.parserCandidates)
+        ? data.parserCandidates
+        : []
+    );
+    setMatchResults(
+      Array.isArray(data.matchResults)
+        ? data.matchResults
+        : []
+    );
+
+    // Cập nhật localStorage
+    localStorage.setItem(
+      'recruit_jobs',
+      JSON.stringify(Array.isArray(data.jobs) ? data.jobs : [])
+    );
+
+    showToast('Đồng bộ dữ liệu Google Sheets thành công!');
+  } catch (error) {
+    console.error('Lỗi đồng bộ:', error);
+    showToast(error.message || 'Không thể đồng bộ dữ liệu.', 'error');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // TỰ ĐỘNG GỌI ĐỒNG BỘ NGAY KHI ĐĂNG NHẬP THÀNH CÔNG
   useEffect(() => {
