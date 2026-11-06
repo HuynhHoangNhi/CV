@@ -3,11 +3,13 @@ import { X, Settings } from 'lucide-react';
 
 export default function ConfigModal({ n8nConfig, setN8nConfig, onClose, showToast }) {
   const handleSubmit = (e) => {
-    e.preventDefault();
-    showToast('Cấu hình n8n API đã được cập nhật thành công!');
-    onClose();
-  };
+  e.preventDefault();
 
+  localStorage.setItem('n8nConfig', JSON.stringify(n8nConfig));
+
+  showToast('Cấu hình n8n API đã được cập nhật thành công!');
+  onClose();
+};
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl relative border border-slate-200">
