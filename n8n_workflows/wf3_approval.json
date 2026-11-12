@@ -2,41 +2,42 @@
   "nodes": [
     {
       "parameters": {
-        "pollTimes": {
-          "item": [
+        "rule": {
+          "interval": [
             {
-              "mode": "everyMinute"
+              "field": "minutes",
+              "minutesInterval": 1
             }
           ]
-        },
-        "documentId": {
-          "__rl": true,
-          "value": "1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM",
-          "mode": "list",
-          "cachedResultName": "Danh sách ứng viên",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1446628200,
-          "mode": "list",
-          "cachedResultName": "CV_Match_Results",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit#gid=1446628200"
-        },
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -128,
+        1056
+      ],
+      "id": "6abb4694-9525-4384-b45e-6b1267df8bb6",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM public.\"CV_Match_Results\"\nWHERE TRIM(COALESCE(\"Trạng thái gửi email cho ứng viên\", '')) = 'Chưa gửi'\n  AND \"Quyết định của HR\" IN ('Approve', 'Reject')\nORDER BY \"Thời gian đánh giá\" ASC;",
         "options": {}
       },
-      "type": "n8n-nodes-base.googleSheetsTrigger",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
       "position": [
-        -2032,
-        272
+        112,
+        1056
       ],
-      "id": "f453b9a7-74f5-432f-a820-c44bbcc20f54",
-      "name": "Google Sheets Trigger",
+      "id": "982ba24a-85b0-4145-abf9-a5f5ea82f293",
+      "name": "Get Pending Interview Emails",
       "credentials": {
-        "googleSheetsTriggerOAuth2Api": {
-          "id": "ojBHJRSCmUicN7AD",
-          "name": "Google Sheets Trigger account"
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
         }
       }
     },
@@ -51,7 +52,7 @@
           },
           "conditions": [
             {
-              "id": "7e592ba2-4944-432f-b5cb-e29961452a26",
+              "id": "1ae0b8a5-ad54-4507-bc53-2a67e5c5306d",
               "leftValue": "={{ $json[\"Trạng thái gửi email cho ứng viên\"] }}",
               "rightValue": "Chưa gửi",
               "operator": {
@@ -68,10 +69,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -1792,
-        272
+        368,
+        1056
       ],
-      "id": "f3075fdf-b5c2-4d36-a97e-4a911c7a9604",
+      "id": "79a3a905-2ed8-42a3-878b-deddad082cd2",
       "name": "If-Kiểm tra đã gửi Email"
     },
     {
@@ -88,13 +89,13 @@
                 },
                 "conditions": [
                   {
+                    "id": "50400836-3333-4a80-9920-ccdddf3689fb",
                     "leftValue": "={{ $json[\"Quyết định của HR\"] }}",
                     "rightValue": "Approve",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
-                    },
-                    "id": "eaf0b617-e3f1-4b55-8a48-09d3dea80a8c"
+                    }
                   }
                 ],
                 "combinator": "and"
@@ -110,12 +111,12 @@
                 },
                 "conditions": [
                   {
-                    "id": "f346d9be-eec2-44ef-b075-6c769a944575",
+                    "id": "03b8ea42-59de-45f2-a059-8201c190c1ab",
                     "leftValue": "={{ $json[\"Quyết định của HR\"] }}",
                     "rightValue": "Reject",
                     "operator": {
                       "type": "string",
-                      "operation": "contains"
+                      "operation": "equals"
                     }
                   }
                 ],
@@ -129,11 +130,11 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -1536,
-        256
+        608,
+        1056
       ],
-      "id": "13c3f612-de2b-4959-803f-1a42e29f1c4c",
-      "name": "Switch"
+      "id": "c687a73f-22a6-4dc4-abf9-3d1af6e3f601",
+      "name": "Switch - Quyết định HR"
     },
     {
       "parameters": {
@@ -148,29 +149,29 @@
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        -1296,
-        96
+        880,
+        848
       ],
-      "id": "43f6c499-ff4a-459a-9334-aaefd73025ec",
+      "id": "bf1ceb0b-05e1-46fc-ac61-8693fc1e1b48",
       "name": "Lấy lịch trong ngày",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "gM1WGmjoPFNG60yT",
+          "id": "N2h3EXgH6D0O3LOA",
           "name": "Google Calendar account"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "const sheetData = $('Google Sheets Trigger').first().json;\nconst calendarEvents = $input.all();\n\nconst excelDays = Number(sheetData[\"Ngày phỏng vấn\"]);\nconst baseDate = new Date(Date.UTC(1899, 11, 30)); \nbaseDate.setUTCDate(baseDate.getUTCDate() + excelDays);\nconst interviewDate = baseDate.toISOString().split('T')[0]; \n\nconst timeString = sheetData[\"Giờ phỏng vấn\"]; \nconst newStart = new Date(`${interviewDate}T${timeString}:00+07:00`);\nconst newEnd = new Date(newStart.getTime() + 60 * 60 * 1000);\n\nlet isOverlap = false;\n\nif (calendarEvents && calendarEvents.length > 0 && calendarEvents[0].json && calendarEvents[0].json.id) {\n    for (const event of calendarEvents) {\n        const eventData = event.json;\n        if (!eventData.start || !eventData.start.dateTime) continue;\n\n        const existingStart = new Date(eventData.start.dateTime);\n        const existingEnd = new Date(eventData.end.dateTime);\n\n        if (newStart < existingEnd && newEnd > existingStart) {\n            isOverlap = true;\n            break;\n        }\n    }\n}\n\nif (isOverlap) {\n    return [{ json: { status: \"Overlap\" } }];\n} else {\n    return [{ json: { status: \"Clear\", startTime: newStart.toISOString(), endTime: newEnd.toISOString() } }];\n}"
+        "jsCode": "const row = $('Get Pending Interview Emails').item.json;\nconst calendarEvents = $input.all();\n\nconst rawDate = String(row[\"Ngày phỏng vấn\"] || \"\").trim();\n\nif (!/^\\d{4}-\\d{2}-\\d{2}$/.test(rawDate)) {\n  return [{\n    json: {\n      status: \"InvalidDate\",\n      message: \"Ngày phỏng vấn không hợp lệ\"\n    }\n  }];\n}\n\nconst interviewDate = rawDate;\n\nconst rawTime = String(row[\"Giờ phỏng vấn\"] || \"\").trim();\nif (!/^\\d{1,2}:\\d{2}$/.test(rawTime)) {\n  return [{ json: { status: \"InvalidTime\", message: \"Giờ phỏng vấn không hợp lệ\" } }];\n}\nconst timeString = rawTime.padStart(5, '0');\nconst newStart = new Date(`${interviewDate}T${timeString}:00+07:00`);\nconst newEnd = new Date(newStart.getTime() + 60 * 60 * 1000);\n\nlet isOverlap = false;\nfor (const event of calendarEvents) {\n  const eventData = event.json;\n  if (!eventData.start || !eventData.end) continue;\n\n  // Bỏ qua sự kiện cả ngày; chỉ so sánh sự kiện có giờ cụ thể.\n  if (!eventData.start.dateTime || !eventData.end.dateTime) continue;\n\n  const existingStart = new Date(eventData.start.dateTime);\n  const existingEnd = new Date(eventData.end.dateTime);\n\n  if (newStart < existingEnd && newEnd > existingStart) {\n    isOverlap = true;\n    break;\n  }\n}\n\nif (isOverlap) {\n  return [{ json: { status: \"Overlap\" } }];\n}\nreturn [{ json: { status: \"Clear\", startTime: newStart.toISOString(), endTime: newEnd.toISOString() } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1072,
-        96
+        1120,
+        848
       ],
-      "id": "988ae89a-6185-4a6a-a904-ae5c54fce948",
+      "id": "79726121-8785-4cb0-a616-86ea0172e45d",
       "name": "Code Check Trùng Lịch"
     },
     {
@@ -184,6 +185,7 @@
           },
           "conditions": [
             {
+              "id": "5276353a-95e5-4ec8-9eb1-4289e5e7f80d",
               "leftValue": "={{ $json.status }}",
               "rightValue": "Clear",
               "operator": {
@@ -199,10 +201,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -848,
-        96
+        1360,
+        848
       ],
-      "id": "c12a93d3-2f0f-49eb-aed5-ba0449282895",
+      "id": "3abe9150-6715-4f7c-be98-bb43ce9836fe",
       "name": "If - Lịch Trống?"
     },
     {
@@ -215,235 +217,171 @@
         "start": "={{ $json.startTime }}",
         "end": "={{ $json.endTime }}",
         "additionalFields": {
-          "description": "=Ứng viên: {{ $('Google Sheets Trigger').item.json[\"Họ và tên ứng viên\"] }} \nVị trí: {{ $('Google Sheets Trigger').item.json[\"Vị trí ứng tuyển\"] }}",
-          "summary": "=Phỏng vấn: {{ $('Google Sheets Trigger').item.json[\"Họ và tên ứng viên\"] }}"
+          "description": "=Ứng viên: {{ $('Get Pending Interview Emails').item.json[\"Họ và tên ứng viên\"] }}\nVị trí: {{ $('Get Pending Interview Emails').item.json[\"Vị trí ứng tuyển\"] }}",
+          "summary": "=Phỏng vấn: {{ $('Get Pending Interview Emails').item.json[\"Họ và tên ứng viên\"] }}"
         }
       },
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        -608,
-        -16
+        1600,
+        752
       ],
-      "id": "efcadb79-a92c-4587-ada0-6fc74c5c00e6",
+      "id": "f793b1de-0652-41bb-8040-6d6925c1a2f0",
       "name": "Create an event",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "gM1WGmjoPFNG60yT",
+          "id": "N2h3EXgH6D0O3LOA",
           "name": "Google Calendar account"
         }
       }
     },
     {
       "parameters": {
-        "sendTo": "={{ $('Google Sheets Trigger').item.json[\"Email ứng viên\"] }}",
-        "subject": "Thông báo kết quả tuyển dụng – Bạn đã được duyệt",
-        "message": "=Subject: Thư mời phỏng vấn – {{ $('Google Sheets Trigger').item.json[\"Vị trí ứng tuyển\"] }}\n\n<div style=\"margin:0;padding:32px 12px;background-color:#f3f5f9;font-family:Arial,Helvetica,sans-serif;color:#273449;\">\n  <div style=\"max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;\">\n\n    <div style=\"background-color:#173b67;padding:28px 32px;text-align:center;\">\n      <h1 style=\"margin:0;color:#ffffff;font-size:23px;letter-spacing:0.5px;\">\n        THƯ MỜI PHỎNG VẤN\n      </h1>\n      <p style=\"margin:10px 0 0;color:#dbeafe;font-size:14px;\">\n        THÔNG BÁO KẾT QUẢ XÉT DUYỆT HỒ SƠ\n      </p>\n    </div>\n\n    <div style=\"padding:32px;\">\n      <p style=\"margin:0 0 18px;font-size:16px;\">\n        Kính gửi <strong>{{ $('Google Sheets Trigger').item.json[\"Họ và tên ứng viên\"] }}</strong>,\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 16px;\">\n        Cảm ơn bạn đã quan tâm và ứng tuyển vào vị trí\n        <strong style=\"color:#173b67;\">{{ $('Google Sheets Trigger').item.json[\"Vị trí ứng tuyển\"] }}</strong>\n        tại công ty chúng tôi.\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 22px;\">\n        Chúng tôi trân trọng thông báo rằng hồ sơ của bạn đã vượt qua\n        vòng xét duyệt. Chúng tôi xin mời bạn tham gia buổi phỏng vấn\n        theo thông tin dưới đây:\n      </p>\n\n      <div style=\"background-color:#f0f6ff;border:1px solid #d6e6ff;border-radius:8px;padding:22px;margin:0 0 24px;\">\n        <h2 style=\"margin:0 0 18px;color:#173b67;font-size:17px;\">\n          THÔNG TIN PHỎNG VẤN\n        </h2>\n\n        <p style=\"margin:0 0 14px;font-size:14px;line-height:1.7;\">\n          <strong>Vị trí ứng tuyển:</strong><br>\n          {{ $('Google Sheets Trigger').item.json[\"Vị trí ứng tuyển\"] }}\n        </p>\n\n        <p style=\"margin:0 0 14px;font-size:14px;line-height:1.7;\">\n          <strong>Ngày phỏng vấn:</strong><br>\n         {{ DateTime.fromISO('1899-12-30').plus({ days: Number($('Google Sheets Trigger').item.json[\"Ngày phỏng vấn\"]) }).toFormat('dd/MM/yyyy') }}\n        </p>\n\n        <p style=\"margin:0 0 14px;font-size:14px;line-height:1.7;\">\n          <strong>Giờ phỏng vấn:</strong><br>\n          {{ $('Google Sheets Trigger').item.json[\"Giờ phỏng vấn\"] }}\n        </p>\n        \n        <div style=\"margin:14px 0 0;font-size:14px;line-height:1.7;background-color:#dbeafe;padding:12px;border-radius:6px; border: 1px solid #bfdbfe;\">\n          <strong>🌐 Link tham gia Google Meet:</strong><br>\n          <a href=\"{{ $json.hangoutLink }}\" style=\"color:#1d4ed8; word-break: break-all;\">{{ $json.hangoutLink }}</a>\n        </div>\n      </div>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 16px;\">\n        Bạn vui lòng tham gia đúng lịch hẹn. Nếu cần\n        xác nhận lịch phỏng vấn hoặc có bất kỳ thắc mắc nào, vui lòng\n        phản hồi email này để được hỗ trợ.\n      </p>\n\n      <div style=\"border-top:1px solid #e5e7eb;padding-top:20px;\">\n        <p style=\"margin:0 0 5px;font-size:14px;\">Trân trọng,</p>\n        <p style=\"margin:0;font-size:15px;font-weight:bold;color:#173b67;\">\n          BỘ PHẬN TUYỂN DỤNG\n        </p>\n      </div>\n    </div>\n  </div>\n</div>",
+        "sendTo": "={{ $('Get Pending Interview Emails').item.json[\"Email ứng viên\"] }}",
+        "subject": "=Thư mời phỏng vấn – {{ $('Get Pending Interview Emails').item.json[\"Vị trí ứng tuyển\"] }}",
+        "message": "=<div style=\"margin:0;padding:32px 12px;background-color:#f3f5f9;font-family:Arial,Helvetica,sans-serif;color:#273449;\">\n<div style=\"max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;\">\n<div style=\"background:#173b67;padding:28px 32px;text-align:center;\"><h1 style=\"margin:0;color:#fff;font-size:23px;\">THƯ MỜI PHỎNG VẤN</h1><p style=\"color:#dbeafe;\">THÔNG BÁO KẾT QUẢ XÉT DUYỆT HỒ SƠ</p></div>\n<div style=\"padding:32px;\">\n<p>Kính gửi <strong>{{ $('Get Pending Interview Emails').item.json[\"Họ và tên ứng viên\"] }}</strong>,</p>\n<p>Cảm ơn bạn đã ứng tuyển vị trí <strong>{{ $('Get Pending Interview Emails').item.json[\"Vị trí ứng tuyển\"] }}</strong>.</p>\n<p>Hồ sơ của bạn đã vượt qua vòng xét duyệt. Chúng tôi trân trọng mời bạn tham gia phỏng vấn:</p>\n<div style=\"background:#f0f6ff;border:1px solid #d6e6ff;border-radius:8px;padding:22px;\">\n<p><strong>Vị trí:</strong> {{ $('Get Pending Interview Emails').item.json[\"Vị trí ứng tuyển\"] }}</p>\n<p><strong>Ngày:</strong> {{ DateTime.fromISO('1899-12-30').plus({ days: Number($('Get Pending Interview Emails').item.json[\"Ngày phỏng vấn\"]) }).toFormat('dd/MM/yyyy') }}</p>\n<p><strong>Giờ:</strong> {{ $('Get Pending Interview Emails').item.json[\"Giờ phỏng vấn\"] }}</p>\n<p><strong>Google Meet:</strong><br><a href=\"{{ $json.hangoutLink }}\">{{ $json.hangoutLink }}</a></p>\n</div>\n<p>Vui lòng tham gia đúng lịch hẹn. Nếu có thắc mắc, hãy phản hồi email này.</p>\n<p>Trân trọng,<br><strong>BỘ PHẬN TUYỂN DỤNG</strong></p>\n</div></div></div>",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        -368,
-        -16
+        1840,
+        752
       ],
-      "id": "05d69a05-52bd-40be-a969-3533a8314070",
-      "name": "Send a message",
-      "webhookId": "a6354130-8a87-4c45-9bbe-8d516f3e3183",
+      "id": "df79b009-2c7c-486e-b1db-7d5b45cd7ed9",
+      "name": "Send email - Approved",
+      "webhookId": "c3f98730-7b95-4afa-a12b-b03f82669341",
       "credentials": {
         "gmailOAuth2": {
-          "id": "OWXAyV2Z3BYcoPKu",
+          "id": "1Sye6xkGLyxhbnY2",
           "name": "Gmail account"
         }
       }
     },
     {
       "parameters": {
-        "operation": "update",
-        "documentId": {
-          "__rl": true,
-          "value": "1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM",
-          "mode": "list",
-          "cachedResultName": "Danh sách ứng viên",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1446628200,
-          "mode": "list",
-          "cachedResultName": "CV_Match_Results",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit#gid=1446628200"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Trạng thái gửi email cho ứng viên": "Đã gửi",
-            "Email ứng viên": "={{ $('Google Sheets Trigger').item.json[\"Email ứng viên\"] }}"
-          },
-          "matchingColumns": [
-            "Email ứng viên"
-          ],
-          "schema": [
-            {
-              "id": "Email ứng viên",
-              "displayName": "Email ứng viên",
-              "required": true,
-              "defaultMatch": true,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "readOnly": true,
-              "removed": false
-            },
-            {
-              "id": "Trạng thái gửi email cho ứng viên",
-              "displayName": "Trạng thái gửi email cho ứng viên",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
+        "operation": "executeQuery",
+        "query": "UPDATE public.\"CV_Match_Results\"\nSET \"Trạng thái gửi email cho ứng viên\" = 'Đã gửi'\nWHERE \"application_id\" = '{{ String($(\"Get Pending Interview Emails\").item.json.application_id ?? \"\").replace(/'/g, \"''\") }}'\n  AND TRIM(COALESCE(\"Trạng thái gửi email cho ứng viên\", '')) = 'Chưa gửi';",
         "options": {}
       },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
       "position": [
-        -128,
-        -16
+        2080,
+        752
       ],
-      "id": "811445c1-595f-46c9-a86e-8a2e66102493",
-      "name": "Update row in sheet",
+      "id": "bc3f3865-fe71-4eff-bf99-2803bcfde06c",
+      "name": "Update PostgreSQL - Approved",
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "NFOkUMuEUcNzg0zT",
-          "name": "Google Sheets account"
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
         }
       }
     },
     {
       "parameters": {
         "sendTo": "phanthi04072006@gmail.com",
-        "subject": "=🚨 Trùng Lịch Phỏng Vấn: {{ $('Google Sheets Trigger').item.json[\"Họ và tên ứng viên\"] }}",
-        "message": "=Hệ thống n8n phát hiện lịch phỏng vấn của ứng viên <b>{{ $('Google Sheets Trigger').item.json[\"Họ và tên ứng viên\"] }}</b> (vào lúc {{ $('Google Sheets Trigger').item.json[\"Giờ phỏng vấn\"] }}) đã bị trùng với một lịch khác trên Google Calendar.<br><br>\nVui lòng truy cập Google Sheets để dời lịch phỏng vấn sang khung giờ khác hợp lệ hơn.",
+        "subject": "=🚨 Trùng lịch phỏng vấn: {{ $('Get Pending Interview Emails').item.json[\"Họ và tên ứng viên\"] }}",
+        "message": "=Hệ thống phát hiện lịch phỏng vấn của ứng viên <b>{{ $('Get Pending Interview Emails').item.json[\"Họ và tên ứng viên\"] }}</b> ({{ $('Get Pending Interview Emails').item.json[\"Ngày phỏng vấn\"] }} lúc {{ $('Get Pending Interview Emails').item.json[\"Giờ phỏng vấn\"] }}) bị trùng với một lịch khác trên Google Calendar.<br><br>Vui lòng đổi ngày/giờ phỏng vấn trong hệ thống, sau đó đặt lại trạng thái email về <b>Chưa gửi</b> để thử lại.",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        -608,
-        208
+        1600,
+        976
       ],
-      "id": "4dc460f0-4067-49fb-beaa-c14ee990c4d7",
+      "id": "c6bc83cc-d6db-40ab-9190-d9bd2198c7dc",
       "name": "Báo Trùng Lịch cho HR",
-      "webhookId": "8bc9fa2f-a128-476e-82a5-2ab1df0b748b",
+      "webhookId": "9b375538-f9f0-45fd-9402-4f4e43c1ced7",
       "credentials": {
         "gmailOAuth2": {
-          "id": "OWXAyV2Z3BYcoPKu",
+          "id": "1Sye6xkGLyxhbnY2",
           "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.\"CV_Match_Results\"\nSET \"Trạng thái gửi email cho ứng viên\" = 'Trùng lịch - cần đổi lịch'\nWHERE \"application_id\" = '{{ String($(\"Get Pending Interview Emails\").item.json.application_id ?? \"\").replace(/'/g, \"''\") }}'\n  AND TRIM(COALESCE(\"Trạng thái gửi email cho ứng viên\", '')) = 'Chưa gửi';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1840,
+        976
+      ],
+      "id": "b75c16e3-41bc-4b80-9089-fbaefc3907d2",
+      "name": "Update PostgreSQL - Conflict",
+      "credentials": {
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
         }
       }
     },
     {
       "parameters": {
         "sendTo": "={{ $json[\"Email ứng viên\"] }}",
-        "subject": "Thông báo kết quả tuyển dụng",
-        "message": "=Subject: Thông báo kết quả tuyển dụng – {{ $json[\"Vị trí ứng tuyển\"] }}\n\n<div style=\"margin:0;padding:32px 12px;background-color:#f3f5f9;font-family:Arial,Helvetica,sans-serif;color:#273449;\">\n  <div style=\"max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;\">\n\n    <!-- Header -->\n    <div style=\"background-color:#173b67;padding:28px 32px;text-align:center;\">\n      <h1 style=\"margin:0;color:#ffffff;font-size:22px;letter-spacing:0.4px;\">\n        THÔNG BÁO KẾT QUẢ TUYỂN DỤNG\n      </h1>\n      <p style=\"margin:10px 0 0;color:#dbeafe;font-size:14px;\">\n        CẢM ƠN BẠN ĐÃ QUAN TÂM VÀ ỨNG TUYỂN\n      </p>\n    </div>\n\n    <!-- Email content -->\n    <div style=\"padding:32px;\">\n      <p style=\"margin:0 0 20px;font-size:16px;\">\n        Kính gửi <strong>{{ $json[\"Họ và tên ứng viên\"] }}</strong>,\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 16px;\">\n        Công ty chúng tôi xin chân thành cảm ơn bạn đã quan tâm,\n        dành thời gian tìm hiểu và ứng tuyển vào vị trí\n        <strong style=\"color:#173b67;\">{{ $json[\"Vị trí ứng tuyển\"] }}</strong>.\n      </p>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 20px;\">\n        Sau khi xem xét hồ sơ và đánh giá mức độ phù hợp với các\n        yêu cầu của vị trí tuyển dụng, chúng tôi rất tiếc phải thông\n        báo rằng bạn chưa được lựa chọn trong đợt tuyển dụng lần này.\n      </p>\n\n      <!-- Result box -->\n      <div style=\"background-color:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #64748b;border-radius:6px;padding:20px;margin:0 0 24px;\">\n        <p style=\"margin:0 0 12px;font-size:14px;color:#475569;\">\n          <strong>THÔNG TIN KẾT QUẢ ỨNG TUYỂN</strong>\n        </p>\n        <p style=\"margin:0 0 8px;font-size:14px;line-height:1.7;\">\n          <strong>Họ và tên:</strong> {{ $json[\"Họ và tên ứng viên\"] }}\n        </p>\n        <p style=\"margin:0;font-size:14px;line-height:1.7;\">\n          <strong>Vị trí ứng tuyển:</strong> {{ $json[\"Vị trí ứng tuyển\"] }}\n        </p>\n      </div>\n\n      <p style=\"font-size:15px;line-height:1.8;margin:0 0 16px;\">\n        Chúng tôi trân trọng sự quan tâm, nỗ lực và thời gian bạn\n        đã dành cho quá trình ứng tuyển. Quyết định này chỉ phản ánh\n        mức độ phù hợp với yêu cầu của vị trí trong thời điểm hiện tại.\n      </p>\n\n      <div style=\"border-top:1px solid #e5e7eb;padding-top:20px;\">\n        <p style=\"margin:0 0 8px;font-size:14px;\">Trân trọng,</p>\n        <p style=\"margin:0;font-size:15px;font-weight:bold;color:#173b67;\">\n          BỘ PHẬN TUYỂN DỤNG\n        </p>\n      </div>\n    </div>\n\n  </div>\n</div>",
+        "subject": "=Thông báo kết quả tuyển dụng – {{ $json[\"Vị trí ứng tuyển\"] }}",
+        "message": "=<div style=\"margin:0;padding:32px 12px;background:#f3f5f9;font-family:Arial,Helvetica,sans-serif;color:#273449;\">\n<div style=\"max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;\">\n<div style=\"background:#173b67;padding:28px 32px;text-align:center;\"><h1 style=\"margin:0;color:#fff;font-size:22px;\">THÔNG BÁO KẾT QUẢ TUYỂN DỤNG</h1></div>\n<div style=\"padding:32px;\">\n<p>Kính gửi <strong>{{ $json[\"Họ và tên ứng viên\"] }}</strong>,</p>\n<p>Cảm ơn bạn đã quan tâm và ứng tuyển vào vị trí <strong>{{ $json[\"Vị trí ứng tuyển\"] }}</strong>.</p>\n<p>Sau khi xem xét hồ sơ, chúng tôi rất tiếc phải thông báo rằng bạn chưa được lựa chọn trong đợt tuyển dụng lần này.</p>\n<p>Quyết định này chỉ phản ánh mức độ phù hợp với yêu cầu của vị trí trong thời điểm hiện tại. Chúng tôi trân trọng sự quan tâm và thời gian bạn đã dành cho quá trình ứng tuyển.</p>\n<p>Trân trọng,<br><strong>BỘ PHẬN TUYỂN DỤNG</strong></p>\n</div></div></div>",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        -1296,
-        384
+        880,
+        1232
       ],
-      "id": "130af633-3008-49b6-a5f3-af47cf03e154",
-      "name": "Send a message1",
-      "webhookId": "18a13275-4577-420b-9a9f-bb4385dadef8",
+      "id": "a140c3cf-e1a1-417b-9b29-c00e620b7502",
+      "name": "Send email - Rejected",
+      "webhookId": "20fbbec5-bb8e-4710-a729-680b097f3a5f",
       "credentials": {
         "gmailOAuth2": {
-          "id": "OWXAyV2Z3BYcoPKu",
+          "id": "1Sye6xkGLyxhbnY2",
           "name": "Gmail account"
         }
       }
     },
     {
       "parameters": {
-        "operation": "update",
-        "documentId": {
-          "__rl": true,
-          "value": "1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM",
-          "mode": "list",
-          "cachedResultName": "Danh sách ứng viên",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1446628200,
-          "mode": "list",
-          "cachedResultName": "CV_Match_Results",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit#gid=1446628200"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Trạng thái gửi email cho ứng viên": "Đã gửi",
-            "Email ứng viên": "={{ $('Google Sheets Trigger').item.json[\"Email ứng viên\"] }}"
-          },
-          "matchingColumns": [
-            "Email ứng viên"
-          ],
-          "schema": [
-            {
-              "id": "Email ứng viên",
-              "displayName": "Email ứng viên",
-              "required": true,
-              "defaultMatch": true,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "readOnly": true,
-              "removed": false
-            },
-            {
-              "id": "Trạng thái gửi email cho ứng viên",
-              "displayName": "Trạng thái gửi email cho ứng viên",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
+        "operation": "executeQuery",
+        "query": "UPDATE public.\"CV_Match_Results\"\nSET \"Trạng thái gửi email cho ứng viên\" = 'Đã gửi'\nWHERE \"application_id\" = '{{ String($(\"Get Pending Interview Emails\").item.json.application_id ?? \"\").replace(/'/g, \"''\") }}'\n  AND TRIM(COALESCE(\"Trạng thái gửi email cho ứng viên\", '')) = 'Chưa gửi';",
         "options": {}
       },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
       "position": [
-        -1072,
-        384
+        1120,
+        1232
       ],
-      "id": "42d17452-037b-4bbc-9852-05cf549c4b62",
-      "name": "Update row in sheet1",
+      "id": "815f6557-7efe-4943-84a7-44aa4a2a9037",
+      "name": "Update PostgreSQL - Rejected",
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "NFOkUMuEUcNzg0zT",
-          "name": "Google Sheets account"
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
         }
       }
     }
   ],
   "connections": {
-    "Google Sheets Trigger": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Interview Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending Interview Emails": {
       "main": [
         [
           {
@@ -458,14 +396,14 @@
       "main": [
         [
           {
-            "node": "Switch",
+            "node": "Switch - Quyết định HR",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Switch": {
+    "Switch - Quyết định HR": {
       "main": [
         [
           {
@@ -476,7 +414,7 @@
         ],
         [
           {
-            "node": "Send a message1",
+            "node": "Send email - Rejected",
             "type": "main",
             "index": 0
           }
@@ -527,29 +465,40 @@
       "main": [
         [
           {
-            "node": "Send a message",
+            "node": "Send email - Approved",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Send a message": {
+    "Send email - Approved": {
       "main": [
         [
           {
-            "node": "Update row in sheet",
+            "node": "Update PostgreSQL - Approved",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Send a message1": {
+    "Báo Trùng Lịch cho HR": {
       "main": [
         [
           {
-            "node": "Update row in sheet1",
+            "node": "Update PostgreSQL - Conflict",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email - Rejected": {
+      "main": [
+        [
+          {
+            "node": "Update PostgreSQL - Rejected",
             "type": "main",
             "index": 0
           }
@@ -560,6 +509,6 @@
   "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "99388b8339efccbe9f14e88ced7079baf20ac00d5927e5a94fca2f60deaaf3ba"
+    "instanceId": "eee14b112b30926b290dc9ff284daa75e23e4dde372b00cba20e2a5c88fd4e8f"
   }
 }
