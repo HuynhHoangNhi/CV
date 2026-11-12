@@ -6,18 +6,19 @@
         "path": "upload-cv",
         "responseMode": "responseNode",
         "options": {
+          "allowedOrigins": "https://cv-one-sigma-13.vercel.app/",
           "binaryPropertyName": "data"
         }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.2,
       "position": [
-        -1152,
-        208
+        192,
+        1024
       ],
-      "id": "1cdea752-7ae2-40e0-88f4-fa9442027b19",
+      "id": "afbdae67-b893-433f-8302-998c05e14454",
       "name": "Webhook",
-      "webhookId": "8d3a52d4-a2bc-4d2b-8ad0-426c3a7a9c85"
+      "webhookId": "21183900-b081-43c0-b183-50573f5f69d9"
     },
     {
       "parameters": {
@@ -46,27 +47,11 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -912,
-        208
+        432,
+        1024
       ],
-      "id": "6b4689d8-fe39-476a-afa0-bb1d1015dba8",
+      "id": "b6c1e6a7-ab44-4566-b3ea-ef7a4959ac45",
       "name": "If"
-    },
-    {
-      "parameters": {
-        "operation": "write",
-        "fileName": "=/data/uploads/{{ $execution.id }}_{{ $binary.data0?.fileName || 'cv.pdf' }}",
-        "dataPropertyName": "data0",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1.1,
-      "position": [
-        -224,
-        0
-      ],
-      "id": "ee499987-6708-4aaa-a001-85aaf7cc92e4",
-      "name": "Read/Write Files from Disk"
     },
     {
       "parameters": {
@@ -79,10 +64,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -144,
-        432
+        1216,
+        1248
       ],
-      "id": "c710802c-8959-4bbe-9aaf-b39ec5f65f53",
+      "id": "ceffe603-f73a-472e-adb7-e60099f6bba4",
       "name": "Respond to Webhook"
     },
     {
@@ -94,10 +79,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.1,
       "position": [
-        64,
-        0
+        1200,
+        816
       ],
-      "id": "ef684401-ab45-4df4-a977-329789c192d4",
+      "id": "6b2b8496-7b1e-4a42-92a5-95a3fe3c6202",
       "name": "Extract from File"
     },
     {
@@ -110,10 +95,10 @@
       "type": "@n8n/n8n-nodes-langchain.informationExtractor",
       "typeVersion": 1.2,
       "position": [
-        384,
-        0
+        1520,
+        816
       ],
-      "id": "95756558-371e-4e82-a651-2424fc6985f6",
+      "id": "9799e198-c097-4672-94ad-2e7acdf21c0c",
       "name": "Information Extractor",
       "retryOnFail": true,
       "waitBetweenTries": 2000
@@ -126,203 +111,40 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        416,
-        192
+        1520,
+        1072
       ],
-      "id": "6ae0944c-c2d9-432d-a4d5-ebd1afc15757",
+      "id": "3d3d8d73-1330-4838-bafc-16ac8fb51c73",
       "name": "Groq Chat Model",
       "credentials": {
         "groqApi": {
-          "id": "QiDaUYyK4A7YUnVn",
+          "id": "BjfLU1mJti4yvU9m",
           "name": "Groq account"
         }
       }
     },
     {
       "parameters": {
-        "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM",
-          "mode": "list",
-          "cachedResultName": "Danh sách ứng viên",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1001,
-          "mode": "list",
-          "cachedResultName": "Danh sách ứng viên - CV Parser",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrj8t9K3jPqjRcrOj0n5R7Mz7JV8STFlGlldKhzpBM/edit#gid=1001"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Email": "={{ $json.output?.email || $json.email || '' }}",
-            "Số điện thoại": "={{ $json.output?.so_dien_thoai || $json.output?.phone || $json.so_dien_thoai || $json.phone || '' }}",
-            "Kỹ năng": "={{ ($json.output?.ky_nang || $json.output?.skills || $json.ky_nang || $json.skills || []).join(', ') }}",
-            "Kinh nghiệm": "={{ ($json.output?.kinh_nghiem || $json.output?.experience || $json.kinh_nghiem || $json.experience || []).join('; ') }}",
-            "Học Vấn": "={{ ($json.output?.hoc_van || $json.output?.education || $json.hoc_van || $json.education || []).join('; ') }}",
-            "Vị trí ứng tuyển": "={{ ($json.output?.applied_position || $json.applied_position || '').replace(/\\s*\\(?-\\s*JOB\\d+\\)?/i, '').trim() }}",
-            "Thời gian nộp": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
-            "job_id": "={{ ($json.output?.applied_position || $json.applied_position || '').match(/JOB\\d+/i)?.[0]?.toUpperCase() || 'JOB001' }}",
-            "Trạng thái gửi email cho HR": "Chưa gửi",
-            "Họ và tên": "={{ $json.output?.full_name || $json.output?.ho_va_ten || $json.output?.name || $json.ho_va_ten || $json.full_name || $json.name || '' }}"
-          },
-          "matchingColumns": [
-            "id"
-          ],
-          "schema": [
-            {
-              "id": "Họ và tên",
-              "displayName": "Họ và tên",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "Email",
-              "displayName": "Email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "Số điện thoại",
-              "displayName": "Số điện thoại",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "Kỹ năng",
-              "displayName": "Kỹ năng",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "Kinh nghiệm",
-              "displayName": "Kinh nghiệm",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "Học Vấn",
-              "displayName": "Học Vấn",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "Vị trí ứng tuyển",
-              "displayName": "Vị trí ứng tuyển",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "Thời gian nộp",
-              "displayName": "Thời gian nộp",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "job_id",
-              "displayName": "job_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "Trạng thái gửi email cho HR",
-              "displayName": "Trạng thái gửi email cho HR",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {}
+        "operation": "executeQuery",
+        "query": "INSERT INTO public.\"CV_Parser\" (\n  \"Họ và tên\",\n  \"Email\",\n  \"Số điện thoại\",\n  \"Kỹ năng\",\n  \"Kinh nghiệm\",\n  \"Học Vấn\",\n  \"Vị trí ứng tuyển\",\n  \"Thời gian nộp\",\n  \"job_id\",\n  \"Check_Exists\"\n)\nVALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)\nRETURNING *;",
+        "options": {
+          "queryReplacement": "=={{\n[\n  $json.ho_va_ten || $json.output?.name || $json.name || '',\n  $json.output?.email || $json.email || '',\n  $json.so_dien_thoai || $json.output?.phone || $json.phone || '',\n  Array.isArray($json.output?.skills || $json.skills)\n    ? ($json.output?.skills || $json.skills).join(', ')\n    : ($json.output?.skills || $json.skills || ''),\n  Array.isArray($json.output?.experience || $json.experience)\n    ? ($json.output?.experience || $json.experience).join('; ')\n    : ($json.output?.experience || $json.experience || ''),\n  Array.isArray($json.output?.education || $json.education)\n    ? ($json.output?.education || $json.education).join('; ')\n    : ($json.output?.education || $json.education || ''),\n  String($json.output?.applied_position || $json.applied_position || '').replace(/\\s*\\(?-\\s*JOB\\d+\\)?/i, '').trim(),\n  $now.toFormat('yyyy-MM-dd HH:mm:ss'),\n  String($json.output?.applied_position || $json.applied_position || '').match(/JOB\\d+/i)?.[0]?.toUpperCase() || 'JOB001',\n  'Chưa có'\n]\n}}"
+        }
       },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
       "position": [
-        1008,
-        0
+        2176,
+        816
       ],
-      "id": "97aabde9-42cf-4019-a395-32fa958a7cb1",
-      "name": "Append row in sheet",
+      "id": "3ed943bd-0794-4001-8ce9-1dfa7eb8d000",
+      "name": "Save Candidate to PostgreSQL",
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "HMONN8OsdVtmrggq",
-          "name": "Google Sheets account"
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
         }
       }
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "sg7tYEZdInKAZv9r",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/sg7tYEZdInKAZv9r",
-          "cachedResultName": "CV Processing"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {},
-          "matchingColumns": [],
-          "schema": [],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.4,
-      "position": [
-        1248,
-        -16
-      ],
-      "id": "4572962c-ddb0-4185-9504-c31074fc6571",
-      "name": "Call 'CV Processing'",
-      "alwaysOutputData": false,
-      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -330,7 +152,7 @@
           "assignments": [
             {
               "id": "26973270-fd47-46c6-80d5-98c8bf48344c",
-              "name": "=fileSizeMB",
+              "name": "fileSizeMB",
               "value": "={{ parseFloat($binary.data0.fileSize) / 1024 }}",
               "type": "number"
             }
@@ -342,10 +164,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        -688,
-        192
+        656,
+        1008
       ],
-      "id": "e2e82392-a5dc-4778-ab2d-91ec28c00acc",
+      "id": "5f768dce-e6c3-484d-affa-8935b5ba98e0",
       "name": "Edit Fields"
     },
     {
@@ -376,24 +198,54 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -448,
-        192
+        896,
+        1008
       ],
-      "id": "03fe2a2b-fb55-47c4-a817-1a7dfbd8908b",
+      "id": "e0ba32d3-5a37-48e9-9429-8ab8d184f203",
       "name": "If1"
     },
     {
       "parameters": {
-        "jsCode": "for (const item of $input.all()) {\n  // Chuẩn hóa số điện thoại về dạng chuẩn (+84)\n  let phone = item.json.output?.phone || item.json.phone || '';\n  phone = phone.replace(/[^0-9+]/g, '');\n  if (phone.startsWith('0')) {\n    phone = '+84' + phone.slice(1);\n  }\n  \n  // Viết hoa chữ cái đầu cho Họ và Tên\n  let name = item.json.output?.name || item.json.name || '';\n  if (name) {\n    name = name.toLowerCase().replace(/(^\\w{1})|(\\s+\\w{1})/g, letter => letter.toUpperCase());\n  }\n\n  // Gán lại dữ liệu đã làm sạch\n  item.json.ho_va_ten = name;\n  item.json.so_dien_thoai = phone;\n}\n\nreturn $input.all();"
+        "jsCode": "for (const item of $input.all()) {\n  // Chuẩn hóa số điện thoại về dạng chuẩn (+84)\n  let phone = item.json.output?.phone || item.json.phone || '';\n  phone = String(phone).replace(/[^0-9+]/g, '');\n  if (phone.startsWith('0')) {\n    phone = '+84' + phone.slice(1);\n  }\n\n  // Viết hoa chữ cái đầu cho Họ và Tên\n  let name = item.json.output?.name || item.json.name || '';\n  if (name) {\n    name = String(name).toLowerCase().replace(/(^\\w{1})|(\\s+\\w{1})/g, letter => letter.toUpperCase());\n  }\n\n  item.json.ho_va_ten = name;\n  item.json.so_dien_thoai = phone;\n}\n\nreturn $input.all();"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        736,
-        0
+        1904,
+        816
       ],
-      "id": "2182d81d-f654-43b2-a6a7-a37567017b4b",
+      "id": "f813d57c-6e90-48f8-926b-4f6f29cb4e0f",
       "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "IErKFWqw4i3k4XdK",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/IErKFWqw4i3k4XdK",
+          "cachedResultName": "W2 - CV Matching - PostgreSQL"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        2496,
+        816
+      ],
+      "id": "cc9130e2-a407-41de-b8c6-7efb58bf7ecc",
+      "name": "Call 'wf2'",
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
     }
   ],
   "connections": {
@@ -413,18 +265,6 @@
         [
           {
             "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        []
-      ]
-    },
-    "Read/Write Files from Disk": {
-      "main": [
-        [
-          {
-            "node": "Extract from File",
             "type": "main",
             "index": 0
           }
@@ -464,11 +304,11 @@
         ]
       ]
     },
-    "Append row in sheet": {
+    "Save Candidate to PostgreSQL": {
       "main": [
         [
           {
-            "node": "Call 'CV Processing'",
+            "node": "Call 'wf2'",
             "type": "main",
             "index": 0
           }
@@ -490,7 +330,7 @@
       "main": [
         [
           {
-            "node": "Read/Write Files from Disk",
+            "node": "Extract from File",
             "type": "main",
             "index": 0
           }
@@ -508,7 +348,7 @@
       "main": [
         [
           {
-            "node": "Append row in sheet",
+            "node": "Save Candidate to PostgreSQL",
             "type": "main",
             "index": 0
           }
@@ -518,6 +358,7 @@
   },
   "pinData": {},
   "meta": {
-    "instanceId": "4eeb9490923bde1d302c216ecf5db73101b42102d73c9b53de2f9791db4034ef"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eee14b112b30926b290dc9ff284daa75e23e4dde372b00cba20e2a5c88fd4e8f"
   }
 }
