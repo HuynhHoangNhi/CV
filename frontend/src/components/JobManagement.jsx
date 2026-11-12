@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Briefcase, Plus, Edit, Trash2,
@@ -36,9 +35,14 @@ export default function JobManagement({
   const [jobForm, setJobForm] = useState(emptyForm);
 
   const safeJobs = Array.isArray(jobs) ? jobs : [];
+
   const safeCandidates = Array.isArray(parserCandidates)
     ? parserCandidates
     : [];
+
+  // ==============================
+  // FILTER JOBS
+  // ==============================
 
   const filteredJobs = safeJobs.filter(j =>
     `${j.job_id || ''} ${j.job_title || ''} ${j.required_skills || ''}`
@@ -46,46 +50,71 @@ export default function JobManagement({
       .includes(searchJob.toLowerCase())
   );
 
+  // ==============================
+  // FILTER CANDIDATES
+  // ==============================
+
   const filteredCandidates = safeCandidates.filter(c =>
     `${c['Họ và tên'] || ''} ${c.Email || ''} ${c['Vị trí ứng tuyển'] || ''}`
       .toLowerCase()
       .includes(searchCandidate.toLowerCase())
   );
 
-  // Tạo mã JD tiếp theo, tránh trùng sau khi xóa công việc
+  // ==============================
+  // GENERATE JOB ID
+  // ==============================
+
   const generateJobId = () => {
-    const numbers = safeJobs
-      .map(job => {
-        const match = String(job.job_id || '').match(/^JOB(\d+)$/i);
-        return match ? Number(match[1]) : 0;
-      });
+    const numbers = safeJobs.map(job => {
+      const match = String(job.job_id || '').match(/^JOB(\d+)$/i);
+      return match ? Number(match[1]) : 0;
+    });
 
     const nextNumber = Math.max(0, ...numbers) + 1;
+
     return `JOB${String(nextNumber).padStart(3, '0')}`;
   };
 
+  // ==============================
+  // OPEN ADD FORM
+  // ==============================
+
   const openAdd = () => {
     setEditingJob(null);
+
     setJobForm({
       ...emptyForm,
       job_id: generateJobId()
     });
+
     setShowJobModal(true);
   };
 
+  // ==============================
+  // OPEN EDIT FORM
+  // ==============================
+
   const openEdit = (job) => {
     setEditingJob(job);
+
     setJobForm({
       ...emptyForm,
       ...job
     });
+
     setShowJobModal(true);
   };
 
-  // Gửi yêu cầu đến n8n
+  // ==============================
+  // SEND REQUEST TO N8N
+  // PostgreSQL operations
+  // ==============================
+
   const sendJobAction = async (action, payload) => {
     if (!jobManagementUrl) {
-      throw new Error('Chưa cấu hình URL webhook quản lý công việc.');
+      throw new Error(
+        'Chưa cấu hình URL webhook quản lý công việc.'
+      );
     }
 
     const response = await fetch(jobManagementUrl, {
@@ -108,7 +137,9 @@ export default function JobManagement({
       try {
         result = JSON.parse(responseText);
       } catch {
-        result = { message: responseText };
+        throw new Error(
+          'Phản hồi từ n8n không phải JSON hợp lệ.'
+        );
       }
     }
 
@@ -123,7 +154,10 @@ export default function JobManagement({
     return result;
   };
 
-  // Xóa công việc
+  // ==============================
+  // DELETE JOB
+  // ==============================
+
   const handleDelete = async (jobId) => {
     const confirmed = window.confirm(
       `Bạn có chắc chắn muốn xóa vị trí ${jobId}?`
@@ -138,27 +172,36 @@ export default function JobManagement({
         job_id: jobId
       });
 
-      // Chỉ cập nhật giao diện sau khi n8n xác nhận
-      setJobs(prev => prev.filter(j => j.job_id !== jobId));
+      showToast(
+        `Đã xóa vị trí ${jobId} thành công.`
+      );
 
-      showToast(`Đã xóa vị trí ${jobId} trên hệ thống.`);
-
-      // Lấy lại dữ liệu mới nhất từ Google Sheets
+      // Đồng bộ dữ liệu mới nhất từ PostgreSQL
       if (fetchSheetData) {
         await fetchSheetData();
+      } else {
+        setJobs(prev =>
+          prev.filter(j => j.job_id !== jobId)
+        );
       }
+
     } catch (error) {
       console.error('Lỗi xóa công việc:', error);
+
       showToast(
         error.message || 'Không thể xóa công việc. Vui lòng thử lại.',
         'error'
       );
+
     } finally {
       setDeletingJobId(null);
     }
   };
 
-  // Thêm hoặc cập nhật công việc
+  // ==============================
+  // ADD / UPDATE JOB
+  // ==============================
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -175,6 +218,7 @@ export default function JobManagement({
       benefits: jobForm.benefits.trim()
     };
 
+    // Kiểm tra dữ liệu bắt buộc
     if (
       !normalizedJob.job_id ||
       !normalizedJob.job_title ||
@@ -184,14 +228,20 @@ export default function JobManagement({
         'Vui lòng nhập mã vị trí, chức danh và kỹ năng bắt buộc.',
         'error'
       );
+
       return;
     }
 
+    // Kiểm tra mã công việc trùng lặp
     if (
       !editingJob &&
       safeJobs.some(j => j.job_id === normalizedJob.job_id)
     ) {
-      showToast('Mã vị trí đã tồn tại.', 'error');
+      showToast(
+        'Mã vị trí đã tồn tại.',
+        'error'
+      );
+
       return;
     }
 
@@ -199,12 +249,37 @@ export default function JobManagement({
 
     try {
       if (editingJob) {
-        // Cập nhật: dùng mã cũ để n8n tìm đúng dòng trong Sheet
+
+        // CẬP NHẬT CÔNG VIỆC
         await sendJobAction('update', {
           job_id: editingJob.job_id,
           job: normalizedJob
         });
 
+        showToast(
+          'Cập nhật vị trí tuyển dụng thành công!'
+        );
+
+      } else {
+
+        // THÊM CÔNG VIỆC MỚI
+        await sendJobAction('create', {
+          job: normalizedJob
+        });
+
+        showToast(
+          'Thêm vị trí tuyển dụng thành công!'
+        );
+
+      }
+
+      setShowJobModal(false);
+      setEditingJob(null);
+
+      // Lấy dữ liệu mới nhất từ PostgreSQL
+      if (fetchSheetData) {
+        await fetchSheetData();
+      } else if (editingJob) {
         setJobs(prev =>
           prev.map(j =>
             j.job_id === editingJob.job_id
@@ -212,37 +287,29 @@ export default function JobManagement({
               : j
           )
         );
-
-        showToast('Cập nhật vị trí tuyển dụng thành công!');
       } else {
-        // Thêm mới
-        await sendJobAction('create', {
-          job: normalizedJob
-        });
-
-        setJobs(prev => [normalizedJob, ...prev]);
-
-        showToast('Thêm vị trí tuyển dụng thành công!');
+        setJobs(prev => [
+          normalizedJob,
+          ...prev
+        ]);
       }
 
-      setShowJobModal(false);
-      setEditingJob(null);
-
-      // Đồng bộ lại dữ liệu thực tế từ Google Sheets
-      if (fetchSheetData) {
-        await fetchSheetData();
-      }
     } catch (error) {
       console.error('Lỗi lưu công việc:', error);
 
       showToast(
-        error.message || 'Không thể lưu dữ liệu vào Google Sheets.',
+        error.message || 'Không thể lưu dữ liệu vào PostgreSQL.',
         'error'
       );
+
     } finally {
       setIsSaving(false);
     }
   };
+
+  // ==============================
+  // JOB STATUS STYLE
+  // ==============================
 
   const statusStyle = (status) => {
     if (status === 'Open') {
@@ -256,14 +323,22 @@ export default function JobManagement({
     return 'bg-amber-50 text-amber-700 border-amber-200';
   };
 
+  // ==============================
+  // RENDER
+  // ==============================
+
   return (
     <div className="space-y-6">
 
       {/* DANH SÁCH CÔNG VIỆC */}
       <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+
         <div className="p-5 md:p-6 border-b border-slate-200">
+
           <div className="flex flex-wrap justify-between items-center gap-3">
+
             <div className="flex items-center gap-3">
+
               <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
                 <Briefcase size={21} />
               </div>
@@ -272,10 +347,12 @@ export default function JobManagement({
                 <h3 className="font-bold text-slate-800">
                   Danh sách vị trí tuyển dụng
                 </h3>
+
                 <p className="text-xs text-slate-500 mt-1">
                   Quản lý thông tin và yêu cầu của các vị trí công việc
                 </p>
               </div>
+
             </div>
 
             <button
@@ -286,10 +363,13 @@ export default function JobManagement({
               <Plus size={17} />
               Thêm vị trí
             </button>
+
           </div>
 
           <div className="mt-5 flex flex-wrap justify-between items-center gap-3">
+
             <div className="relative w-full md:max-w-sm">
+
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 size={17}
@@ -301,16 +381,21 @@ export default function JobManagement({
                 placeholder="Tìm mã JD, chức danh, kỹ năng..."
                 className="w-full pl-10 pr-3 py-2.5 text-sm"
               />
+
             </div>
 
             <span className="text-xs text-slate-500">
               Tổng số: <b className="text-slate-800">{safeJobs.length}</b> vị trí
             </span>
+
           </div>
+
         </div>
 
         <div className="overflow-x-auto">
+
           <table className="w-full text-sm text-left">
+
             <thead>
               <tr>
                 <th className="px-5 py-4">Mã JD</th>
@@ -323,9 +408,16 @@ export default function JobManagement({
             </thead>
 
             <tbody className="divide-y divide-slate-100">
+
               {filteredJobs.length > 0 ? (
+
                 filteredJobs.map(j => (
-                  <tr key={j.job_id} className="hover:bg-blue-50/40">
+
+                  <tr
+                    key={j.job_id}
+                    className="hover:bg-blue-50/40"
+                  >
+
                     <td className="px-5 py-4 font-mono text-xs font-semibold text-blue-700">
                       {j.job_id}
                     </td>
@@ -343,6 +435,7 @@ export default function JobManagement({
                     </td>
 
                     <td className="px-5 py-4">
+
                       <span className={`px-2.5 py-1 rounded-md border text-xs font-semibold ${statusStyle(j.status)}`}>
                         {j.status === 'Open'
                           ? 'Đang tuyển'
@@ -350,10 +443,13 @@ export default function JobManagement({
                             ? 'Đã đóng'
                             : j.status}
                       </span>
+
                     </td>
 
                     <td className="px-5 py-4">
+
                       <div className="flex justify-center gap-2">
+
                         <button
                           onClick={() => openEdit(j)}
                           disabled={!!deletingJobId || isSaving}
@@ -374,26 +470,40 @@ export default function JobManagement({
                             : <Trash2 size={16} />
                           }
                         </button>
+
                       </div>
+
                     </td>
+
                   </tr>
+
                 ))
+
               ) : (
+
                 <tr>
                   <td colSpan="6" className="text-center py-10 text-slate-400">
                     Không tìm thấy vị trí tuyển dụng phù hợp.
                   </td>
                 </tr>
+
               )}
+
             </tbody>
+
           </table>
+
         </div>
+
       </section>
 
       {/* HỒ SƠ ỨNG VIÊN */}
       <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+
         <div className="p-5 md:p-6 border-b border-slate-200">
+
           <div className="flex items-center gap-3">
+
             <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
               <FileSpreadsheet size={21} />
             </div>
@@ -402,14 +512,18 @@ export default function JobManagement({
               <h3 className="font-bold text-slate-800">
                 Hồ sơ ứng viên đã tiếp nhận
               </h3>
+
               <p className="text-xs text-slate-500 mt-1">
                 Thông tin được trích xuất từ hồ sơ CV
               </p>
             </div>
+
           </div>
 
           <div className="mt-5 flex flex-wrap justify-between items-center gap-3">
+
             <div className="relative w-full md:max-w-sm">
+
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 size={17}
@@ -421,16 +535,21 @@ export default function JobManagement({
                 placeholder="Tìm ứng viên, email, vị trí..."
                 className="w-full pl-10 pr-3 py-2.5 text-sm"
               />
+
             </div>
 
             <span className="text-xs text-slate-500">
               Tổng số: <b className="text-slate-800">{safeCandidates.length}</b> hồ sơ
             </span>
+
           </div>
+
         </div>
 
         <div className="overflow-x-auto">
+
           <table className="w-full text-sm text-left">
+
             <thead>
               <tr>
                 <th className="px-5 py-4">Ứng viên</th>
@@ -442,32 +561,42 @@ export default function JobManagement({
             </thead>
 
             <tbody className="divide-y divide-slate-100">
+
               {filteredCandidates.length > 0 ? (
+
                 filteredCandidates.map((c, idx) => (
+
                   <tr
                     key={c.firebaseId || c.application_id || c.Email || idx}
                     className="hover:bg-blue-50/40"
                   >
+
                     <td className="px-5 py-4 font-semibold text-slate-800">
                       {c['Họ và tên'] || 'Chưa cập nhật'}
                     </td>
 
                     <td className="px-5 py-4">
+
                       <p className="text-slate-700">
                         {c.Email || 'Chưa có email'}
                       </p>
+
                       <p className="text-xs text-slate-400 mt-1">
                         {c['Số điện thoại'] || ''}
                       </p>
+
                     </td>
 
                     <td className="px-5 py-4">
+
                       <p className="font-medium text-slate-700">
                         {c['Vị trí ứng tuyển'] || 'Chưa xác định'}
                       </p>
+
                       <p className="text-xs text-blue-600 mt-1">
                         {c.job_id || ''}
                       </p>
+
                     </td>
 
                     <td className="px-5 py-4 text-slate-600 whitespace-normal">
@@ -477,26 +606,38 @@ export default function JobManagement({
                     <td className="px-5 py-4 text-xs text-slate-500">
                       {c['Thời gian nộp'] || ''}
                     </td>
+
                   </tr>
+
                 ))
+
               ) : (
+
                 <tr>
                   <td colSpan="5" className="text-center py-10 text-slate-400">
                     Chưa có hồ sơ phù hợp.
                   </td>
                 </tr>
+
               )}
+
             </tbody>
+
           </table>
+
         </div>
+
       </section>
 
       {/* FORM THÊM / SỬA CÔNG VIỆC */}
       {showJobModal && (
+
         <div className="fixed inset-0 z-50 bg-slate-900/50 flex items-center justify-center p-4">
+
           <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
 
             <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-5 flex items-center justify-between z-10">
+
               <div>
                 <h3 className="font-bold text-lg text-slate-800">
                   {editingJob
@@ -517,11 +658,15 @@ export default function JobManagement({
               >
                 <X size={20} />
               </button>
+
             </div>
 
             <form onSubmit={handleSave} className="p-6 space-y-5">
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                 <div>
+
                   <label className="block text-sm font-semibold mb-2">
                     Mã vị trí *
                   </label>
@@ -538,9 +683,11 @@ export default function JobManagement({
                       Mã vị trí không thể thay đổi sau khi tạo.
                     </p>
                   )}
+
                 </div>
 
                 <div>
+
                   <label className="block text-sm font-semibold mb-2">
                     Hình thức làm việc
                   </label>
@@ -559,10 +706,13 @@ export default function JobManagement({
                     <option>Remote</option>
                     <option>Hybrid</option>
                   </select>
+
                 </div>
+
               </div>
 
               <div>
+
                 <label className="block text-sm font-semibold mb-2">
                   Tên chức danh *
                 </label>
@@ -577,9 +727,11 @@ export default function JobManagement({
                   placeholder="Ví dụ: Backend Developer"
                   className="w-full px-3 py-2.5 text-sm"
                 />
+
               </div>
 
               <div>
+
                 <label className="block text-sm font-semibold mb-2">
                   Mô tả công việc
                 </label>
@@ -593,9 +745,11 @@ export default function JobManagement({
                   })}
                   className="w-full px-3 py-2.5 text-sm resize-y"
                 />
+
               </div>
 
               <div>
+
                 <label className="block text-sm font-semibold mb-2">
                   Kỹ năng bắt buộc *
                 </label>
@@ -614,9 +768,11 @@ export default function JobManagement({
                 <p className="text-xs text-slate-400 mt-1">
                   Phân cách các kỹ năng bằng dấu phẩy.
                 </p>
+
               </div>
 
               <div>
+
                 <label className="block text-sm font-semibold mb-2">
                   Kỹ năng ưu tiên
                 </label>
@@ -630,10 +786,13 @@ export default function JobManagement({
                   placeholder="Docker, Redis..."
                   className="w-full px-3 py-2.5 text-sm"
                 />
+
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                 <div>
+
                   <label className="block text-sm font-semibold mb-2">
                     Kinh nghiệm yêu cầu
                   </label>
@@ -646,9 +805,11 @@ export default function JobManagement({
                     })}
                     className="w-full px-3 py-2.5 text-sm"
                   />
+
                 </div>
 
                 <div>
+
                   <label className="block text-sm font-semibold mb-2">
                     Hạn ứng tuyển
                   </label>
@@ -662,10 +823,13 @@ export default function JobManagement({
                     })}
                     className="w-full px-3 py-2.5 text-sm"
                   />
+
                 </div>
+
               </div>
 
               <div>
+
                 <label className="block text-sm font-semibold mb-2">
                   Quyền lợi
                 </label>
@@ -679,9 +843,11 @@ export default function JobManagement({
                   })}
                   className="w-full px-3 py-2.5 text-sm"
                 />
+
               </div>
 
               <div>
+
                 <label className="block text-sm font-semibold mb-2">
                   Trạng thái
                 </label>
@@ -697,9 +863,11 @@ export default function JobManagement({
                   <option value="Open">Đang tuyển</option>
                   <option value="Closed">Đã đóng</option>
                 </select>
+
               </div>
 
               <div className="flex justify-end gap-3 border-t border-slate-200 pt-5">
+
                 <button
                   type="button"
                   onClick={() => setShowJobModal(false)}
@@ -714,6 +882,7 @@ export default function JobManagement({
                   disabled={isSaving}
                   className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold flex items-center gap-2 disabled:opacity-60"
                 >
+
                   {isSaving && (
                     <Loader2 size={16} className="animate-spin" />
                   )}
@@ -723,12 +892,19 @@ export default function JobManagement({
                     : editingJob
                       ? 'Lưu thay đổi'
                       : 'Tạo vị trí'}
+
                 </button>
+
               </div>
+
             </form>
+
           </div>
+
         </div>
+
       )}
+
     </div>
   );
 }
