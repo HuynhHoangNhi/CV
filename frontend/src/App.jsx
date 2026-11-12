@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 import CandidatePortal from './components/CandidatePortal';
@@ -16,18 +15,15 @@ import {
   Settings
 } from 'lucide-react';
 
-const DEFAULT_RAILWAY_CONFIG = {
-  uploadCvUrl:
-    'https://n8n-production-2734a.up.railway.app/webhook/upload-cv',
+// ==============================
+// DEFAULT N8N VPS CONFIGURATION
+// ==============================
 
-  jobManagementUrl:
-    'https://n8n-production-2734a.up.railway.app/webhook/manage-jobs',
-
-  hrDecisionUrl:
-    'https://n8n-production-2734a.up.railway.app/webhook/hr-decision',
-
-  getSheetDataUrl:
-    'https://n8n-production-2734a.up.railway.app/webhook/get-sheet-data'
+const DEFAULT_N8N_CONFIG = {
+  uploadCvUrl: 'https://cv-n8n.duckdns.org/webhook/upload-cv',
+  jobManagementUrl: 'https://cv-n8n.duckdns.org/webhook/manage-jobs',
+  hrDecisionUrl: 'https://cv-n8n.duckdns.org/webhook/hr-decision',
+  getSheetDataUrl: 'https://cv-n8n.duckdns.org/webhook/get-sheet-data'
 };
 
 // Danh sách email quản trị
@@ -57,6 +53,10 @@ const INITIAL_JOBS = [
   }
 ];
 
+// ==============================
+// LOAD JSON FROM LOCAL STORAGE
+// ==============================
+
 function loadJson(key, fallback) {
   try {
     const saved = localStorage.getItem(key);
@@ -72,7 +72,12 @@ function loadJson(key, fallback) {
   }
 }
 
+// ==============================
+// APP COMPONENT
+// ==============================
+
 export default function App() {
+
   // ==============================
   // USER SESSION
   // ==============================
@@ -100,35 +105,49 @@ export default function App() {
   // ==============================
 
   const [n8nConfig, setN8nConfig] = useState(() => {
+
     const savedConfig = loadJson('n8nConfig', null);
 
     if (!savedConfig || typeof savedConfig !== 'object') {
-      return DEFAULT_RAILWAY_CONFIG;
+      return DEFAULT_N8N_CONFIG;
     }
 
     // Gộp cấu hình cũ với cấu hình mặc định
     const mergedConfig = {
-      ...DEFAULT_RAILWAY_CONFIG,
+      ...DEFAULT_N8N_CONFIG,
       ...savedConfig
     };
 
-    // Chuyển cấu hình localhost cũ sang Railway
-    if (
-      Object.values(mergedConfig).some(
-        url => typeof url === 'string' && url.includes('localhost')
-      )
-    ) {
-      return DEFAULT_RAILWAY_CONFIG;
-    }
+    // Tự động chuyển URL cũ sang VPS mới
+    const oldHosts = [
+      'n8n-production-2734a.up.railway.app',
+      'localhost'
+    ];
+
+    Object.keys(mergedConfig).forEach(key => {
+
+      const url = mergedConfig[key];
+
+      if (
+        typeof url === 'string' &&
+        oldHosts.some(host => url.includes(host))
+      ) {
+        mergedConfig[key] = DEFAULT_N8N_CONFIG[key];
+      }
+
+    });
 
     return mergedConfig;
   });
 
+  // Tự động lưu cấu hình n8n
   useEffect(() => {
+
     localStorage.setItem(
       'n8nConfig',
       JSON.stringify(n8nConfig)
     );
+
   }, [n8nConfig]);
 
   // ==============================
@@ -136,11 +155,13 @@ export default function App() {
   // ==============================
 
   const [jobs, setJobs] = useState(() => {
+
     const savedJobs = loadJson('recruit_jobs', null);
 
     return Array.isArray(savedJobs)
       ? savedJobs
       : INITIAL_JOBS;
+
   });
 
   const [parserCandidates, setParserCandidates] = useState([]);
@@ -148,10 +169,12 @@ export default function App() {
 
   // Lưu danh sách công việc vào localStorage
   useEffect(() => {
+
     localStorage.setItem(
       'recruit_jobs',
       JSON.stringify(jobs)
     );
+
   }, [jobs]);
 
   // ==============================
@@ -159,23 +182,31 @@ export default function App() {
   // ==============================
 
   const showToast = useCallback((message, type = 'success') => {
+
     setToast({
       message,
       type
     });
+
   }, []);
 
   // ==============================
-  // SYNC GOOGLE SHEETS THROUGH N8N
+  // SYNC POSTGRESQL THROUGH N8N
   // ==============================
 
   const fetchSheetData = useCallback(async () => {
+
     if (syncInProgress.current) {
       return false;
     }
 
     if (!n8nConfig.getSheetDataUrl) {
-      showToast('Chưa cấu hình URL đồng bộ dữ liệu.', 'error');
+
+      showToast(
+        'Chưa cấu hình URL đồng bộ dữ liệu.',
+        'error'
+      );
+
       return false;
     }
 
@@ -183,6 +214,7 @@ export default function App() {
     setIsLoading(true);
 
     try {
+
       const response = await fetch(
         n8nConfig.getSheetDataUrl,
         {
@@ -194,24 +226,32 @@ export default function App() {
       );
 
       if (!response.ok) {
+
         throw new Error(
           `Webhook trả về lỗi HTTP ${response.status}`
         );
+
       }
 
       const data = await response.json();
 
       if (!data || typeof data !== 'object') {
-        throw new Error('Dữ liệu trả về không hợp lệ.');
+
+        throw new Error(
+          'Dữ liệu trả về không hợp lệ.'
+        );
+
       }
 
       if (data.success === false) {
+
         throw new Error(
-          data.message || 'n8n không thể đọc dữ liệu Google Sheets.'
+          data.message || 'n8n không thể đọc dữ liệu PostgreSQL.'
         );
+
       }
 
-      // Kiểm tra đầy đủ cấu trúc phản hồi
+      // Kiểm tra cấu trúc dữ liệu trả về
       const requiredArrays = [
         'jobs',
         'parserCandidates',
@@ -223,31 +263,37 @@ export default function App() {
       );
 
       if (invalidFields.length > 0) {
+
         throw new Error(
           `Thiếu dữ liệu hoặc sai định dạng: ${invalidFields.join(', ')}`
         );
+
       }
 
-      // Cập nhật dữ liệu từ Google Sheets
+      // Cập nhật dữ liệu từ PostgreSQL
       setJobs(data.jobs);
       setParserCandidates(data.parserCandidates);
       setMatchResults(data.matchResults);
 
-      // Cập nhật dữ liệu công việc vào localStorage
+      // Cập nhật danh sách công việc vào localStorage
       localStorage.setItem(
         'recruit_jobs',
         JSON.stringify(data.jobs)
       );
 
       showToast(
-        'Đồng bộ dữ liệu Google Sheets thành công!',
+        'Đồng bộ dữ liệu PostgreSQL thành công!',
         'success'
       );
 
       return true;
 
     } catch (error) {
-      console.error('Lỗi đồng bộ dữ liệu:', error);
+
+      console.error(
+        'Lỗi đồng bộ dữ liệu PostgreSQL:',
+        error
+      );
 
       showToast(
         error.message || 'Không thể đồng bộ dữ liệu từ n8n.',
@@ -257,9 +303,12 @@ export default function App() {
       return false;
 
     } finally {
+
       syncInProgress.current = false;
       setIsLoading(false);
+
     }
+
   }, [n8nConfig.getSheetDataUrl, showToast]);
 
   // ==============================
@@ -267,9 +316,11 @@ export default function App() {
   // ==============================
 
   useEffect(() => {
+
     if (currentUser) {
       fetchSheetData();
     }
+
   }, [currentUser, fetchSheetData]);
 
   // ==============================
@@ -277,18 +328,29 @@ export default function App() {
   // ==============================
 
   const handleLogin = (e) => {
+
     e.preventDefault();
 
     const email = loginEmail.trim().toLowerCase();
     const password = loginPassword.trim();
 
     if (!email) {
-      showToast('Vui lòng nhập địa chỉ email.', 'error');
+
+      showToast(
+        'Vui lòng nhập địa chỉ email.',
+        'error'
+      );
+
       return;
     }
 
     if (!password) {
-      showToast('Vui lòng nhập mật khẩu.', 'error');
+
+      showToast(
+        'Vui lòng nhập mật khẩu.',
+        'error'
+      );
+
       return;
     }
 
@@ -313,6 +375,7 @@ export default function App() {
         ? 'Đăng nhập thành công với quyền Quản trị viên!'
         : 'Đăng nhập thành công vào Cổng ứng viên!'
     );
+
   };
 
   // ==============================
@@ -320,6 +383,7 @@ export default function App() {
   // ==============================
 
   const handleLogout = () => {
+
     setCurrentUser(null);
 
     localStorage.removeItem('recruit_user');
@@ -328,6 +392,7 @@ export default function App() {
     setLoginPassword('');
 
     showToast('Đã đăng xuất khỏi hệ thống.');
+
   };
 
   // ==============================
@@ -335,7 +400,9 @@ export default function App() {
   // ==============================
 
   if (!currentUser) {
+
     return (
+
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#174EA6]/90 to-slate-900 flex items-center justify-center p-4">
 
         <div className="bg-white/95 backdrop-blur-md rounded-3xl max-w-md w-full p-8 md:p-10 shadow-2xl border border-white/20 relative overflow-hidden">
@@ -389,6 +456,7 @@ export default function App() {
                 />
 
               </div>
+
             </div>
 
             {/* PASSWORD */}
@@ -415,6 +483,7 @@ export default function App() {
                 />
 
               </div>
+
             </div>
 
             {/* SUBMIT */}
@@ -433,6 +502,7 @@ export default function App() {
             </button>
 
           </form>
+
         </div>
 
         {toast && (
@@ -444,7 +514,9 @@ export default function App() {
         )}
 
       </div>
+
     );
+
   }
 
   // ==============================
@@ -452,6 +524,7 @@ export default function App() {
   // ==============================
 
   return (
+
     <div className="min-h-screen bg-[#F3F6FC]">
 
       {/* TOP HEADER */}
@@ -480,7 +553,7 @@ export default function App() {
               onClick={fetchSheetData}
               disabled={isLoading}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg border border-blue-200 transition-colors cursor-pointer disabled:opacity-50"
-              title="Đồng bộ lại từ Google Sheets"
+              title="Đồng bộ lại dữ liệu từ PostgreSQL"
             >
 
               <RefreshCw
@@ -506,10 +579,13 @@ export default function App() {
 
             {/* USER */}
             <span className="text-xs text-slate-600 hidden sm:inline">
+
               Xin chào,{' '}
+
               <strong className="text-slate-800">
                 {currentUser.email}
               </strong>
+
             </span>
 
             {/* LOGOUT */}
@@ -525,7 +601,9 @@ export default function App() {
             </button>
 
           </div>
+
         </div>
+
       </header>
 
       {/* ADMIN / CANDIDATE PORTAL */}
@@ -544,7 +622,7 @@ export default function App() {
           // Webhook thêm / sửa / xóa công việc
           jobManagementUrl={n8nConfig.jobManagementUrl}
 
-          // Đồng bộ dữ liệu Google Sheets
+          // Đồng bộ dữ liệu từ PostgreSQL thông qua n8n
           fetchSheetData={fetchSheetData}
           isLoading={isLoading}
 
@@ -575,23 +653,29 @@ export default function App() {
 
       {/* CONFIGURATION MODAL */}
       {showConfigModal && (
+
         <ConfigModal
           n8nConfig={n8nConfig}
           setN8nConfig={setN8nConfig}
           onClose={() => setShowConfigModal(false)}
           showToast={showToast}
         />
+
       )}
 
       {/* TOAST */}
       {toast && (
+
         <Toast
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
         />
+
       )}
 
     </div>
+
   );
+
 }
