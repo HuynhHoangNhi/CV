@@ -1,0 +1,187 @@
+{
+  "name": "Get Data - PostgreSQL",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "get-sheet-data",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7e83884d-15d7-4191-ad61-4eeeab335f0a",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        16
+      ],
+      "webhookId": "get-sheet-data-pg"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM \"Job_Postings\" ORDER BY job_id ASC;",
+        "options": {}
+      },
+      "id": "1e8cef6b-3f85-45d6-8c82-a962df5c26c8",
+      "name": "Get Jobs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -400,
+        16
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM \"CV_Parser\";",
+        "options": {}
+      },
+      "id": "ac5680c2-9e19-41a0-b32a-5495f6221f87",
+      "name": "Get Candidates",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -192,
+        16
+      ],
+      "alwaysOutputData": false,
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM \"CV_Match_Results\";",
+        "options": {}
+      },
+      "id": "52d213ac-77ee-4e70-91a9-2345a69a7c44",
+      "name": "Get Matches",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -32,
+        16
+      ],
+      "alwaysOutputData": false,
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const clean = (arr) => arr.map(i => i.json).filter(obj => Object.keys(obj).length > 0);\n\nconst jobs = clean($('Get Jobs').all());\nconst parserCandidates = clean($('Get Candidates').all());\nconst matchResults = clean($('Get Matches').all());\n\nreturn [{\n  json: {\n    success: true,\n    jobs,\n    parserCandidates,\n    matchResults\n  }\n}];"
+      },
+      "id": "1a7615a5-d3cc-43d6-afa7-1688d96f3255",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "96ee7cb2-e244-468f-8957-24e81d736e75",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        16
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Jobs": {
+      "main": [
+        [
+          {
+            "node": "Get Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Candidates": {
+      "main": [
+        [
+          {
+            "node": "Get Matches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Matches": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1f971bf9-4dd1-4657-b274-16c45932785a",
+  "meta": {
+    "instanceId": "eee14b112b30926b290dc9ff284daa75e23e4dde372b00cba20e2a5c88fd4e8f"
+  },
+  "nodeGroups": [],
+  "id": "f3TKx2utgzwHPkbN",
+  "tags": []
+}
