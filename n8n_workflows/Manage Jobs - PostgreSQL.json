@@ -1,0 +1,119 @@
+{
+  "name": "Manage Jobs - PostgreSQL",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "manage-jobs",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7fdb6694-a975-497a-960a-7c31af298e95",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        0
+      ],
+      "webhookId": "manage-jobs-pg"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst action = (body.action || 'create').toLowerCase();\nconst job = body.job || body;\n\nconst esc = (val) => String(val ?? '').replace(/'/g, \"''\");\nlet sql = '';\n\nif (action === 'delete') {\n  sql = `DELETE FROM \"Job_Postings\" WHERE job_id = '${esc(job.job_id)}';`;\n} else if (action === 'update') {\n  sql = `UPDATE \"Job_Postings\" SET \n    job_title = '${esc(job.job_title)}',\n    job_description = '${esc(job.job_description)}',\n    required_skills = '${esc(job.required_skills)}',\n    preferred_skills = '${esc(job.preferred_skills)}',\n    required_experience = '${esc(job.required_experience)}',\n    work_type = '${esc(job.work_type)}',\n    benefits = '${esc(job.benefits)}',\n    deadline = '${esc(job.deadline)}',\n    status = '${esc(job.status || 'Open')}'\n    WHERE job_id = '${esc(job.job_id)}';`;\n} else {\n  sql = `INSERT INTO \"Job_Postings\" (job_id, job_title, job_description, required_skills, preferred_skills, required_experience, work_type, benefits, deadline, status) VALUES (\n    '${esc(job.job_id)}',\n    '${esc(job.job_title)}',\n    '${esc(job.job_description)}',\n    '${esc(job.required_skills)}',\n    '${esc(job.preferred_skills)}',\n    '${esc(job.required_experience)}',\n    '${esc(job.work_type)}',\n    '${esc(job.benefits)}',\n    '${esc(job.deadline)}',\n    '${esc(job.status || 'Open')}'\n  )\n  ON CONFLICT (job_id) DO UPDATE SET\n    job_title = EXCLUDED.job_title,\n    job_description = EXCLUDED.job_description,\n    required_skills = EXCLUDED.required_skills,\n    preferred_skills = EXCLUDED.preferred_skills,\n    required_experience = EXCLUDED.required_experience,\n    work_type = EXCLUDED.work_type,\n    benefits = EXCLUDED.benefits,\n    deadline = EXCLUDED.deadline,\n    status = EXCLUDED.status;`;\n}\n\nreturn [{ json: { sql, action, job_id: job.job_id } }];"
+      },
+      "id": "3fad582c-b7bb-42fd-a7a1-723f00fcb792",
+      "name": "Build SQL Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.sql }}",
+        "options": {}
+      },
+      "id": "267295eb-4b02-42b7-ad46-16fe974f644b",
+      "name": "Execute Job SQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        128,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\": true, \"message\": \"Cập nhật công việc thành công!\"}",
+        "options": {}
+      },
+      "id": "5ea491c0-f15b-4eaa-a1a8-d20883934c85",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build SQL Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build SQL Query": {
+      "main": [
+        [
+          {
+            "node": "Execute Job SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Job SQL": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b413ba1c-ca53-45db-abaf-29528abd4e31",
+  "meta": {
+    "instanceId": "eee14b112b30926b290dc9ff284daa75e23e4dde372b00cba20e2a5c88fd4e8f"
+  },
+  "nodeGroups": [],
+  "id": "Ephk04iRydrzFt9L",
+  "tags": []
+}
