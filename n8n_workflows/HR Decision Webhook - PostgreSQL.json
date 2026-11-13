@@ -1,0 +1,123 @@
+{
+  "name": "HR Decision Webhook - PostgreSQL",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hr-decision",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "eccfef7f-edf6-48f2-a493-b9a200dc1ab4",
+      "name": "Webhook - HR Decision",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "hr-decision-postgres-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst body = raw.body || raw;\n\nconst applicationId = String(body.application_id || body.applicationId || '').trim();\nconst decision = String(body.decision || '').trim();\nlet interviewDate = String(body.interview_date || body.interviewDate || '').trim();\nconst interviewTime = String(body.interview_time || body.interviewTime || '').trim();\n\nif (!applicationId) {\n  throw new Error('Thiếu application_id.');\n}\n\nif (!['Approve', 'Reject'].includes(decision)) {\n  throw new Error('Quyết định HR không hợp lệ.');\n}\n\nif (decision === 'Approve') {\n  // Hỗ trợ cả định dạng DD/MM/YYYY (14/11/2026) và YYYY-MM-DD (2026-11-14)\n  const dmyMatch = interviewDate.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n  if (dmyMatch) {\n    const [, day, month, year] = dmyMatch;\n    interviewDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;\n  }\n\n  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(interviewDate)) {\n    throw new Error(`Ngày phỏng vấn không hợp lệ: \"${interviewDate}\"`);\n  }\n\n  if (!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(interviewTime)) {\n    throw new Error(`Giờ phỏng vấn không hợp lệ: \"${interviewTime}\"`);\n  }\n}\n\nreturn [{\n  json: {\n    application_id: applicationId,\n    decision,\n    interview_date: decision === 'Approve' ? interviewDate : '',\n    interview_time: decision === 'Approve' ? interviewTime : ''\n  }\n}];"
+      },
+      "id": "3c5d8dfd-d932-4d77-9d81-0d3a56534875",
+      "name": "Validate HR Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH updated AS (\n    UPDATE public.\"CV_Match_Results\"\n    SET\n        \"Quyết định của HR\" = $1,\n        \"Ngày phỏng vấn\" = $2,\n        \"Giờ phỏng vấn\" = $3,\n        \"Trạng thái gửi email cho ứng viên\" = 'Chưa gửi'\n    WHERE \"application_id\" = $4\n    RETURNING \"application_id\"\n)\nSELECT\n    EXISTS (SELECT 1 FROM updated) AS success,\n    CASE\n        WHEN EXISTS (SELECT 1 FROM updated)\n        THEN 'Đã lưu quyết định HR thành công.'\n        ELSE 'Không tìm thấy hồ sơ ứng viên.'\n    END AS message;",
+        "options": {
+          "queryReplacement": "={{ [$json.decision, $json.interview_date, $json.interview_time, $json.application_id] }}"
+        }
+      },
+      "id": "e43857dd-7f4a-44c9-b806-f2609a21a66c",
+      "name": "Update PostgreSQL - HR Decision",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        496,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "vq82LFvu2ueeqRZD",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "1a1d6883-97be-4142-ba00-046815ee038b",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - HR Decision": {
+      "main": [
+        [
+          {
+            "node": "Validate HR Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate HR Decision": {
+      "main": [
+        [
+          {
+            "node": "Update PostgreSQL - HR Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update PostgreSQL - HR Decision": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6fbb0edb-c69c-4a59-9ade-ff7ff250aecd",
+  "meta": {
+    "instanceId": "eee14b112b30926b290dc9ff284daa75e23e4dde372b00cba20e2a5c88fd4e8f"
+  },
+  "nodeGroups": [],
+  "id": "YhBtdRFoOi0yRyHk",
+  "tags": []
+}
